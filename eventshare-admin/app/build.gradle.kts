@@ -5,8 +5,8 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-val prodApiUrl = providers.gradleProperty("EVENTSHARE_API_URL").getOrElse("https://eventshare.com/api/")
-val debugApiUrl = providers.gradleProperty("EVENTSHARE_DEBUG_API_URL").getOrElse("http://10.0.2.2:3000/api/")
+val prodApiUrl = providers.gradleProperty("EVENTSHARE_API_URL").getOrElse("https://eventshare-fawn.vercel.app/api/")
+val debugApiUrl = providers.gradleProperty("EVENTSHARE_DEBUG_API_URL").getOrElse(prodApiUrl)
 
 android {
     namespace = "com.eventshare.admin"

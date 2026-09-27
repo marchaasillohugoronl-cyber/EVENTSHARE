@@ -55,8 +55,8 @@ Nunca subas `.env.local` al repositorio (ya está en `.gitignore`).
 1. Abre la carpeta `eventshare-admin/` con Android Studio y espera la sincronización de Gradle.
    Si falta `gradlew`, Android Studio usa su propio Gradle; desde terminal puedes generarlo con `gradle wrapper --gradle-version 8.9`.
 2. La URL de la API está en `eventshare-admin/gradle.properties`:
-   - `EVENTSHARE_DEBUG_API_URL` (debug): `http://10.0.2.2:3000/api/` funciona con el emulador. Con un teléfono físico usa la IP de tu PC, por ejemplo `http://192.168.1.20:3000/api/`.
-   - `EVENTSHARE_API_URL` (release): tu dominio HTTPS, terminado en `/`.
+   - `EVENTSHARE_DEBUG_API_URL` (debug) y `EVENTSHARE_API_URL` (release) apuntan a `https://eventshare-fawn.vercel.app/api/`, tanto en emulador como en teléfono físico.
+   - Para desarrollo local, cambia solo `EVENTSHARE_DEBUG_API_URL` a `http://10.0.2.2:3000/api/` (emulador) o a la IP de tu PC, por ejemplo `http://192.168.1.20:3000/api/` (teléfono). Las URLs deben terminar en `/`.
 3. Ejecuta la app → *Regístrate* → crea tu primer evento → verás el QR.
 
 ## Probar el flujo completo
