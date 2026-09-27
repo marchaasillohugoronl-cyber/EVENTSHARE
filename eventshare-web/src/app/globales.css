@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand-rgb: 31 41 55;
+  --on-brand-rgb: 255 255 255;
+}
+
+html { -webkit-text-size-adjust: 100%; }
+body {
+  @apply bg-paper font-sans text-ink antialiased;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible { outline: 2px solid rgb(var(--brand-rgb)); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+.btn { @apply inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-[15px] font-semibold transition-transform active:scale-[0.97] disabled:opacity-50; }
+.btn-primary { @apply bg-brand text-onbrand; }
+.btn-ghost { @apply border border-ink/20 bg-transparent text-ink; }
+.field { @apply h-12 w-full rounded-xl border border-line bg-white px-4 text-base outline-none focus:border-ink; }

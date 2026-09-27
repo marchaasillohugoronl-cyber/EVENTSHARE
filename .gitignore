@@ -1,0 +1,12 @@
+node_modules/
+.next/
+.env
+.env.*
+!.env.example
+*.local
+build/
+.gradle/
+local.properties
+.idea/
+.vercel/
+*.tsbuildinfo

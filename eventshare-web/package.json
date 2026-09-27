@@ -1,0 +1,46 @@
+{
+  "name": "eventshare-web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "node scripts/migrar.mjs",
+    "test:ratelimit": "node --test scripts/prueba-limite-solicitudes.mjs",
+    "test:api": "node --test scripts/prueba-api.mjs",
+    "test:tablas": "node --test scripts/prueba-tablas-espanol.mjs",
+    "test:cloudinary": "tsx --test scripts/prueba-cloudinary.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.700.0",
+    "@aws-sdk/s3-request-presigner": "^3.700.0",
+    "bcryptjs": "^2.4.3",
+    "google-auth-library": "^10.9.1",
+    "jose": "^5.9.6",
+    "next": "^15.5.26",
+    "pg": "^8.13.1",
+    "qrcode": "^1.5.4",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.17.0",
+    "@types/pg": "^8.11.10",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "autoprefixer": "^10.4.20",
+    "dotenv": "^16.4.5",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^3.4.15",
+    "tsx": "^4.23.15",
+    "typescript": "^5.6.3"
+  },
+  "overrides": {
+    "postcss": "$postcss"
+  }
+}

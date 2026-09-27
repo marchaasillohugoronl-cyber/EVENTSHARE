@@ -1,0 +1,6 @@
+-keepattributes Signature, InnerClasses, EnclosingMethod, RuntimeVisibleAnnotations, AnnotationDefault
+-keep class com.eventshare.admin.data.** { *; }
+-keepclassmembers class **$$serializer { *; }
+-dontwarn org.bouncycastle.**
+-dontwarn org.conscrypt.**
+-dontwarn org.openjsse.**
