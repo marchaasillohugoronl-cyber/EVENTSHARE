@@ -1,3 +1,5 @@
+import { resolverUrlPublica } from '../lib/urlPublica';
+
 // Lectura perezosa de variables de entorno: falla solo cuando se usa una que falta.
 function req(name: string): string {
   const v = process.env[name];
@@ -10,7 +12,7 @@ export const env = {
   get jwtAccessSecret() { return req('JWT_ACCESS_SECRET'); },
   get appUrl() {
     const vercelHost = process.env.VERCEL_PROJECT_PRODUCTION_URL;
-    return (process.env.NEXT_PUBLIC_APP_URL || (vercelHost ? `https://${vercelHost}` : 'http://localhost:3000')).replace(/\/$/, '');
+    return resolverUrlPublica(process.env.NEXT_PUBLIC_APP_URL, vercelHost);
   },
   get allowedOrigins() {
     return (process.env.ALLOWED_ORIGINS || '').split(',').map((s) => s.trim()).filter(Boolean);

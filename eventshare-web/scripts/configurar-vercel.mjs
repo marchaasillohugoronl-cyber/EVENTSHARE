@@ -12,6 +12,7 @@ const project = JSON.parse(readFileSync('.vercel/project.json', 'utf8'));
 if (!project.projectId || !project.orgId) throw new Error('Primero ejecuta vercel link');
 const configured = Object.fromEntries(required.map(name => [name, values[name]]));
 configured.ALLOW_ADMIN_REGISTRATION = 'false';
+configured.NEXT_PUBLIC_APP_URL = 'https://eventshare-fawn.vercel.app';
 for (const name of ['GOOGLE_CLIENT_ID', 'NEXT_PUBLIC_GOOGLE_CLIENT_ID']) {
   if (values[name]) configured[name] = values[name];
 }

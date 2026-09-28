@@ -35,3 +35,17 @@ test('decodifica una imagen QR con el enlace publicado', () => {
   assert.ok(result);
   assert.equal(codigoDesdeQr(result.data, origin), 'ABC123');
 });
+
+ test('recupera el código de los QR antiguos sin navegar al dominio anterior', () => {
+  assert.equal(codigoDesdeQr('https://eventos-sis.vercel.app/e/WJ6V9SND', origin), 'WJ6V9SND');
+  assert.equal(codigoDesdeQr('https://eventos-sis.vercel.app.evil.test/e/WJ6V9SND', origin), null);
+});
+
+import { resolverUrlPublica } from '../src/lib/urlPublica';
+test('corrige el dominio anterior y conserva entornos locales y personalizados', () => {
+  assert.equal(resolverUrlPublica('https://eventos-sis.vercel.app/'), origin);
+  assert.equal(resolverUrlPublica(undefined, 'eventos-sis.vercel.app'), origin);
+  assert.equal(resolverUrlPublica(origin), origin);
+  assert.equal(resolverUrlPublica('http://localhost:3000'), 'http://localhost:3000');
+  assert.equal(resolverUrlPublica('https://events.example.com'), 'https://events.example.com');
+});
