@@ -49,9 +49,9 @@ export default function PostCard({ post, code, readOnly = false }: { post: Post;
 
   const href = `/e/${code}/post/${post.id}`;
   return (
-    <article className="rounded-sm bg-white p-2.5 pb-4 shadow-[0_1px_0_rgba(0,0,0,0.06),0_10px_24px_-14px_rgba(0,0,0,0.35)]">
+    <article className="post-card bg-white p-2.5 pb-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
       {post.photoUrl && (
-        <Link href={href} className="block bg-line/50">
+        <Link href={href} className="photo-link block bg-line/50">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={post.photoUrl} alt={post.message ? `Foto de ${post.author.name}: ${post.message}` : `Foto de ${post.author.name}`}
             loading="lazy" decoding="async" className="block h-auto min-h-48 w-full" />
@@ -59,11 +59,11 @@ export default function PostCard({ post, code, readOnly = false }: { post: Post;
       )}
       <div className="px-1.5 pt-3">
         {post.message && <p className="whitespace-pre-line break-words font-serif text-[19px] leading-snug">{post.message}</p>}
-        <div className="mt-3 flex items-center gap-2.5">
+        <div className="mt-3 flex flex-wrap items-center gap-2.5">
           <Avatar name={post.author.name} url={post.author.avatarUrl} size={28} />
-          <span className="truncate text-sm font-medium">{post.author.name}</span>
+          <span className="min-w-0 max-w-[45%] truncate text-sm font-medium">{post.author.name}</span>
           <span className="text-sm text-muted">{timeAgo(post.createdAt)}</span>
-          <div className="ml-auto flex items-center gap-1">
+          <div className="post-actions ml-auto flex items-center gap-1">
             <button onClick={toggleLike} aria-pressed={liked} aria-label={liked ? 'Quitar me gusta' : 'Me gusta'}
               className="flex h-10 items-center gap-1.5 rounded-full px-3 text-sm">
               <svg viewBox="0 0 24 24" width="20" height="20" className={pop ? 'animate-pop' : ''} onAnimationEnd={() => setPop(false)}

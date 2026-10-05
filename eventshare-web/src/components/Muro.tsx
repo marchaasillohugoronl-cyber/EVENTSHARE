@@ -100,7 +100,7 @@ export default function Feed({ event, mode = 'feed' }: { event: PublicEvent; mod
       {mode === 'grid' ? (
         <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
           {items.map((p) => (
-            <Link key={p.id} href={`/e/${event.code}/post/${p.id}`} className="relative block aspect-square overflow-hidden bg-line/50">
+            <Link key={p.id} href={`/e/${event.code}/post/${p.id}`} className="photo-link page-enter relative block aspect-square overflow-hidden bg-line/50">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={p.photoUrl!} alt={`Foto de ${p.author.name}`} loading="lazy" decoding="async" className="h-full w-full object-cover" />
             </Link>
@@ -112,7 +112,7 @@ export default function Feed({ event, mode = 'feed' }: { event: PublicEvent; mod
         </div>
       )}
 
-      {loading && <p className="py-8 text-center text-sm text-muted" role="status">Cargando…</p>}
+      {loading && <p className="py-8 text-center text-sm text-muted" role="status"><span aria-hidden="true" className="loading-dot" />Cargando…</p>}
       {error && (
         <div className="py-8 text-center" role="alert">
           <p className="text-sm text-red-700">{error}</p>

@@ -1,3 +1,5 @@
+import { mensajeErrorSubida } from './errorSubida';
+
 const ALLOWED = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_DIM = 2200;
 
@@ -34,7 +36,7 @@ export function uploadWithProgress(url: string, body: Blob, fields: Record<strin
     xhr.timeout = 120000;
     xhr.ontimeout = () => reject(new Error('La subida tardo demasiado. Intentalo de nuevo.'));
     xhr.upload.onprogress = (e) => e.lengthComputable && onProgress(Math.round((e.loaded / e.total) * 100));
-    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error('No se pudo subir la foto. Inténtalo de nuevo.')));
+    xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(mensajeErrorSubida(xhr.status, xhr.responseText))));
     xhr.onerror = () => reject(new Error('Error de red al subir la foto.'));
     xhr.send(form);
   });

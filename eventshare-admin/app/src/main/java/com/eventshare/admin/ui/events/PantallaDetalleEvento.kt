@@ -63,6 +63,7 @@ import com.eventshare.admin.ui.common.appViewModel
 import com.eventshare.admin.ui.common.eventStatusLabel
 import com.eventshare.admin.ui.common.formatEventDate
 import com.eventshare.admin.util.Qr
+import com.eventshare.admin.BuildConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -113,7 +114,8 @@ fun EventDetailScreen(
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { vm.load() }
 
     val detail = state.detail
-    val qr = remember(detail?.event?.url) { detail?.event?.url?.let { Qr.bitmap(it) } }
+    val eventUrl = detail?.event?.let { "${BuildConfig.API_BASE_URL.removeSuffix("/").removeSuffix("/api")}/e/${it.code}" }.orEmpty()
+    val qr = remember(eventUrl) { eventUrl.takeIf { it.isNotEmpty() }?.let { Qr.bitmap(it) } }
     val saveQr = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("image/png")) { uri ->
         if (uri != null && qr != null) {
             val ok = Qr.writeTo(context, uri, qr)
@@ -157,13 +159,13 @@ fun EventDetailScreen(
                                 qr.asImageBitmap(), "Código QR del evento", filterQuality = FilterQuality.None,
                                 modifier = Modifier.size(220.dp).clip(RoundedCornerShape(8.dp)),
                             )
-                            Text(ev.url, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(top = 10.dp))
+                            Text(eventUrl, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(top = 10.dp))
                             TextButton(onClick = {
-                                clipboard.setText(AnnotatedString(ev.url))
+                                clipboard.setText(AnnotatedString(eventUrl))
                                 Toast.makeText(context, "Enlace copiado", Toast.LENGTH_SHORT).show()
                             }) { Text("Copiar enlace") }
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                Button(onClick = { Qr.share(context, qr, ev.code, ev.name, ev.url) }) { Text("Compartir QR") }
+                                Button(onClick = { Qr.share(context, qr, ev.code, ev.name, eventUrl) }) { Text("Compartir QR") }
                                 OutlinedButton(onClick = { saveQr.launch("eventshare-${ev.code}.png") }) { Text("Descargar QR") }
                             }
                         }

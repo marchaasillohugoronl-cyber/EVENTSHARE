@@ -18,7 +18,7 @@ export default function LandingForm() {
   return (
     <div className="mt-10 w-full max-w-sm">
     <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); if (valid) openEvent(code.trim().toUpperCase()); }}>
-      <input className="field min-w-0 uppercase tracking-widest" value={code} maxLength={12} placeholder="Código del evento"
+      <input className="field min-w-0 uppercase" value={code} maxLength={12} placeholder="Código del evento"
         aria-label="Código del evento" autoCapitalize="characters" onChange={(e) => setCode(e.target.value)} />
       <button className="btn btn-primary shrink-0" disabled={!valid}>Entrar</button>
     </form>
