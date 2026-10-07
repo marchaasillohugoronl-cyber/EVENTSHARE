@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import EventNav from '@/components/NavegacionEvento';
 import { getEventByCodeCached } from '@/server/eventos';
 import { themeVars } from '@/lib/formato';
+import { esMatrimonio } from '@/lib/temaEvento';
 
 type Props = { children: React.ReactNode; params: Promise<{ code: string }> };
 
@@ -27,7 +28,7 @@ export default async function EventLayout({ children, params }: Props) {
   }
 
   return (
-    <div style={themeVars(ev.primaryColor) as React.CSSProperties} className="min-h-screen pb-28">
+    <div style={themeVars(esMatrimonio(ev.name) ? '#D8BB76' : ev.primaryColor) as React.CSSProperties} className={`min-h-screen pb-28 ${esMatrimonio(ev.name) ? 'wedding-event' : ''}`}>
       <div className="mx-auto max-w-xl">{children}</div>
       <EventNav code={ev.code} canPost={ev.status === 'ACTIVE'} />
     </div>
