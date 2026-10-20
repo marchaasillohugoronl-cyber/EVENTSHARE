@@ -1,6 +1,5 @@
 /* ===== Collage en forma de corazón ===== */
 .heart-stage {
-  --heart-ink: #f3fbff;
   --heart-filter: none;      /* pon grayscale(1) para blanco y negro */
   --heart-piece-bg: #102a42; /* fondo mientras carga cada foto */
   --heart-fade-ms: 520ms;
@@ -10,14 +9,17 @@
   place-items: center;
   position: relative;
   container-type: size;
-  background:
-    radial-gradient(ellipse at 50% 38%, rgb(28 192 241 / .24) 0%, transparent 40%),
-    radial-gradient(ellipse at 14% 90%, rgb(44 104 223 / .22) 0%, transparent 35%),
-    linear-gradient(135deg, #071525 0%, #060b16 48%, #0a1830 100%);
+  /* Fondo gris con iluminación suave. */
+  background-color: #c8c8c8;
+  background-image:
+    radial-gradient(ellipse at center, #dedede 12%, rgb(222 222 222 / .85) 38%, transparent 78%),
+    linear-gradient(135deg, transparent 35%, rgb(255 255 255 / .15) 50%, transparent 65%),
+    linear-gradient(145deg, #d4d4d4, #b5b5b5);
+  background-position: center;
   overflow: hidden;
 }
 
-/* El título fijo de PantallaTv duplicaría el nombre junto al logo. */
+/* Mantiene la presentación libre de títulos superpuestos. */
 .tv-screen:has(.heart-stage) .tv-event-label { display: none; }
 
 .heart-frame {
@@ -36,67 +38,13 @@
   box-shadow: none;
   animation: heart-frame-in 900ms cubic-bezier(.22, 1, .36, 1) both;
 }
-.heart-stage::before {
-  content: '';
-  position: absolute;
-  inset: 1.8cqh;
-  border: 1px solid rgb(185 233 255 / .14);
-  border-radius: clamp(18px, 2.2cqh, 32px);
-  pointer-events: none;
-}
-.heart-stage::after {
-  content: '';
-  position: absolute;
-  width: min(76cqw, 104cqh);
-  aspect-ratio: 1;
-  border: 1px solid rgb(126 216 255 / .1);
-  border-radius: 50%;
-  transform: translateY(-2cqh);
-  pointer-events: none;
-}
-
-/* Marca sutil de la pantalla, sin barra de navegación ni elementos web. */
-.heart-brand {
-  position: absolute;
-  z-index: 3;
-  top: 4cqh;
-  left: 5cqw;
-  display: inline-flex;
-  align-items: center;
-  gap: .7cqh;
-  color: var(--heart-ink);
-  font-family: var(--font-sans), Arial, sans-serif;
-  font-size: clamp(12px, 2cqh, 22px);
-  font-weight: 800;
-  letter-spacing: -.04em;
-  opacity: .92;
-}
-.heart-brand svg { width: 1.75em; height: 1.75em; fill: #38d5ff; filter: drop-shadow(0 .25cqh .7cqh rgb(56 213 255 / .35)); }
-.heart-meta {
-  position: absolute;
-  z-index: 3;
-  top: 4.6cqh;
-  right: 5cqw;
-  display: inline-flex;
-  align-items: center;
-  gap: .65cqh;
-  color: rgb(221 245 255 / .72);
-  font-size: clamp(10px, 1.4cqh, 15px);
-  font-weight: 700;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-.heart-live-dot { width: .9cqh; height: .9cqh; min-width: 7px; min-height: 7px; border-radius: 50%; background: #38d5ff; box-shadow: 0 0 0 .45cqh rgb(56 213 255 / .16); animation: heart-pulse 2s ease-in-out infinite; }
-.heart-stage.is-paused .heart-live-dot { animation-play-state: paused; opacity: .45; }
-
 .heart-collage {
   position: relative;
-  width: min(94cqh, 72cqw);
+  width: min(102cqh, 88cqw);
   aspect-ratio: 100 / 86;
   flex: none;
   z-index: 1;
-  transform: translateY(-1cqh);
-  filter: drop-shadow(0 3cqh 4cqh rgb(0 0 0 / .35));
+  filter: drop-shadow(0 1.5cqh 2.5cqh rgb(25 71 104 / .2));
 }
 
 .heart-piece {
@@ -119,7 +67,6 @@
   object-fit: cover;
   filter: var(--heart-filter);
   animation: heart-fade var(--heart-fade-ms) cubic-bezier(.22, 1, .36, 1) both;
-  will-change: opacity, transform;
 }
 
 .heart-lines {
@@ -134,37 +81,11 @@
 .heart-lines polygon {
   fill: none;
   stroke: rgb(215 247 255 / .84);
-  stroke-width: .5;
+  stroke-width: .32;
   stroke-linejoin: round;
   stroke-linecap: round;
   filter: drop-shadow(0 .12cqh .22cqh rgb(0 0 0 / .28));
 }
-
-.heart-title {
-  font-family: var(--font-sans), Arial, sans-serif;
-  font-style: normal;
-  font-weight: 850;
-  font-size: clamp(24px, 5cqh, 66px);
-  line-height: .98;
-  letter-spacing: -.045em;
-  color: var(--heart-ink);
-  text-align: center;
-  text-wrap: balance;
-  overflow-wrap: anywhere;
-  max-height: 10cqh;
-  /* recorte limpio con puntos suspensivos en lugar de cortar a la mitad */
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
-  overflow: hidden;
-  text-transform: none;
-}
-
-.heart-heading { position: absolute; z-index: 3; bottom: 3.6cqh; left: 50%; width: min(90cqw, 900px); transform: translateX(-50%); display: grid; justify-items: center; gap: .8cqh; animation: heart-title-in 800ms 720ms cubic-bezier(.22, 1, .36, 1) both; }
-.heart-heading-rule { width: 7cqh; height: .35cqh; min-height: 2px; max-height: 4px; background: #38d5ff; box-shadow: 0 0 1.6cqh rgb(56 213 255 / .55); }
-.heart-kicker { color: rgb(196 238 255 / .72); font-family: var(--font-sans), sans-serif; font-size: clamp(9px, 1.35cqh, 15px); font-weight: 750; letter-spacing: .17em; text-transform: uppercase; }
-.heart-heading p { color: #8ce5ff; font-family: var(--font-sans), sans-serif; font-size: clamp(10px, 1.6cqh, 18px); font-weight: 650; letter-spacing: .025em; }
 
 .heart-empty {
   margin: auto;
@@ -172,7 +93,7 @@
   max-width: 32ch;
   text-align: center;
   text-wrap: balance;
-  color: #fff;
+  color: #25445c;
   opacity: .8;
   font-size: clamp(16px, 2vw, 28px);
 }
@@ -182,11 +103,12 @@
   z-index: 5;
   left: max(24px, env(safe-area-inset-left));
   bottom: max(24px, env(safe-area-inset-bottom));
-  min-height: 40px;
+  width: 44px;
+  height: 44px;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 8px 13px;
+  justify-content: center;
+  padding: 0;
   border: 1px solid rgb(255 255 255 / .2);
   border-radius: 999px;
   background: rgb(4 19 36 / .58);
@@ -212,16 +134,14 @@
 }
 
 @keyframes heart-fade {
-  from { opacity: 0; transform: scale(1.035); }
-  to   { opacity: 1; transform: none; }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 @keyframes heart-frame-in { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
-@keyframes heart-title-in { from { opacity: 0; transform: translate(-50%, 1.5cqh); } to { opacity: 1; transform: translateX(-50%); } }
-@keyframes heart-pulse { 50% { transform: scale(.72); opacity: .65; } }
 
 @media (prefers-reduced-motion: reduce) {
   .heart-piece img,
   .heart-piece video { animation: none; will-change: auto; }
-  .heart-frame, .heart-heading, .heart-live-dot { animation: none; }
+  .heart-frame { animation: none; }
   .heart-pause { transition: none; }
 }

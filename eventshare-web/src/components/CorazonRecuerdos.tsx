@@ -78,7 +78,6 @@ export default function CorazonRecuerdos({ posts, name }: Props) {
     [posts, failed]
   );
   const total = media.length;
-  const featuredPost = total ? media[state.slots[0] % total] : undefined;
 
   const markFailed = useCallback((id: string) => {
     setFailed(prev => new Set(prev).add(id));
@@ -134,14 +133,6 @@ export default function CorazonRecuerdos({ posts, name }: Props) {
   return (
     <div className={`heart-stage ${assembled ? 'is-assembled' : 'is-starting'}${paused ? ' is-paused' : ''}`}>
       <div className="heart-frame">
-        <div className="heart-brand" aria-label="EventShare">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 20 7v10l-8 4.5L4 17V7l8-4.5Zm0 4.1L7.6 9v6L12 17.4l4.4-2.4V9L12 6.6Zm0 3.1 2.1 1.2v2.3L12 14.4l-2.1-1.2v-2.3L12 9.7Z" /></svg>
-          <span>eventshare</span>
-        </div>
-        <div className="heart-meta" aria-hidden="true">
-          <span className="heart-live-dot" />
-          <span>{total} {total === 1 ? 'aporte' : 'aportes'}</span>
-        </div>
         <div className="heart-collage" role="group" aria-label={`Collage de recuerdos de ${name}`}>
           {pieces.map(({ style }, i) => {
             const slot = state.slots[i];
@@ -207,22 +198,16 @@ export default function CorazonRecuerdos({ posts, name }: Props) {
           </motion.svg>
         </div>
 
-        <div className="heart-heading">
-          <span className="heart-heading-rule" aria-hidden="true" />
-          <span className="heart-kicker">Mosaico de innovación</span>
-          <h2 className="heart-title">{name}</h2>
-          <p>{featuredPost ? `Aporte de ${featuredPost.author.name}` : 'Ideas, proyectos y comunidad'}</p>
-        </div>
       </div>
 
       <button
         type="button"
         className="heart-pause"
+        aria-label="Pausar presentación"
         aria-pressed={paused}
         onClick={() => setPaused(v => !v)}
       >
         <span aria-hidden="true">{paused ? '▶' : 'Ⅱ'}</span>
-        <span className="heart-pause-label">{paused ? 'Reanudar' : 'Pausar'}</span>
       </button>
     </div>
   );
