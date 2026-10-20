@@ -10,19 +10,22 @@ import TunelRecuerdos from './TunelRecuerdos';
 import MuroAscendente from './MuroAscendente';
 import CorazonRecuerdos from './CorazonRecuerdos';
 import TrioEnmarcado from './TrioEnmarcado';
+import SemicirculoSenati from './SemicirculoSenati';
+import RobotSenati from './RobotSenati';
 // [PASO 1 - NUEVO DISEÑO] Importa aquí tu componente nuevo. Ejemplo:
 // import MiNuevoDiseno from './MiNuevoDiseno';
 import type { Page, Post, PublicEvent } from '@/lib/tipos';
 
 // [PASO 2 - NUEVO DISEÑO] Agrega el identificador del diseño al tipo.
 // Ejemplo: | 'nuevo'
-type Vista = 'wheel' | 'collage' | 'tunnel' | 'wall' | 'heart' | 'trio';
+type Vista = 'wheel' | 'collage' | 'tunnel' | 'wall' | 'heart' | 'trio' | 'semicircle';
 type SeleccionVista = Vista | 'random';
 
 // [PASO 3 - NUEVO DISEÑO] Agrega una línea aquí. Es lo que aparece en el
 // selector "Diseño de pantalla". El orden de esta lista es el orden del menú.
 // Ejemplo: { value: 'nuevo', label: 'Mi nuevo diseño' },
 const VISTAS: { value: Vista; label: string }[] = [
+  { value: 'semicircle', label: 'Semicírculo SENATI · giro cinematográfico' },
   { value: 'tunnel', label: 'Túnel de recuerdos' },
   { value: 'wheel', label: 'Círculo de fotos y videos' },
   { value: 'wall', label: 'Muro ascendente' },
@@ -33,17 +36,16 @@ const VISTAS: { value: Vista; label: string }[] = [
 
 const VISTA_ALEATORIA: { value: SeleccionVista; label: string } = {
   value: 'random',
-  label: 'Cambiar diseño automáticamente (cada 7 s)',
+  label: 'Todas las animaciones · cambiar cada 12 s',
 };
 
 export default function PantallaTv({ event }: { event: PublicEvent }) {
   const screen = useRef<HTMLElement>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [index, setIndex] = useState(0);
-  // Por defecto, la pantalla alterna sin repetir entre todos los diseños
-  // disponibles cada siete segundos.
+  // Recorre todos los diseños en orden, sin saltar ninguno.
   const [selectedView, setSelectedView] = useState<SeleccionVista>('random');
-  const [view, setView] = useState<Vista>('trio');
+  const [view, setView] = useState<Vista>(event.theme === 'SENATI_TEC' ? 'semicircle' : 'trio');
   const [qr, setQr] = useState('');
   const [notice, setNotice] = useState('');
   const [unavailable, setUnavailable] = useState(false);
@@ -93,13 +95,14 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
 
     const cambiarVista = () => {
       setView(actual => {
-        const alternativas = VISTAS.map(({ value }) => value).filter(value => value !== actual);
-        return alternativas[Math.floor(Math.random() * alternativas.length)];
+        const position = VISTAS.findIndex(({ value }) => value === actual);
+        return VISTAS[(position + 1) % VISTAS.length].value;
       });
     };
-    const timer = setInterval(cambiarVista, 7000);
+    if (loading || unavailable || posts.length === 0) return;
+    const timer = setInterval(cambiarVista, 12000);
     return () => clearInterval(timer);
-  }, [selectedView]);
+  }, [selectedView, view, loading, unavailable, posts.length]);
 
   async function fullscreen() {
     try {
@@ -128,6 +131,7 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
     }
 
     switch (view) {
+      case 'semicircle': return <SemicirculoSenati posts={posts} name={event.name} />;
       case 'tunnel': return <TunelRecuerdos posts={posts} name={event.name} />;
       case 'wheel': return <RuedaRecuerdos posts={posts} name={event.name} />;
       case 'wall': return <MuroAscendente posts={posts} name={event.name} />;
@@ -153,6 +157,7 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
     <div className="tv-brand">
       <img src="/senati-simbolo.png" alt="SENATI" width={1254} height={1254} />
     </div>
+    {!unavailable && <aside className="tv-robot" aria-label="Robot de la comunidad SENATI"><RobotSenati compact /></aside>}
     {!unavailable && <details className="tv-qr">
       <summary aria-label="Ampliar QR para participar">
         {qr && <img src={qr} alt="QR para entrar al evento" width={96} height={96} />}

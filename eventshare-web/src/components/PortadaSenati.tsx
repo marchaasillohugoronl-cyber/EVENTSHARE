@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import CollageGeometrico from './CollageGeometrico';
+import RobotSenati from './RobotSenati';
 import QRCode from 'qrcode';
 import { useEffect, useState } from 'react';
 import { api, errorMessage } from '@/lib/api';
@@ -38,6 +39,10 @@ export default function PortadaSenati({ event }: { event: PublicEvent }) {
         <div><Link href="/" className="senati-kicker">EVENTSHARE / COMUNIDAD</Link><h1>{event.name}</h1></div>
         <span className="senati-edition">TECNOLOGÍA<br />QUE NOS UNE</span>
       </div>
+      <section className="senati-welcome" aria-label="Bienvenida a la comunidad SENATI">
+        <div className="senati-welcome-copy"><p className="senati-kicker">EL FUTURO LO CREAMOS JUNTOS</p><h2>Tu talento.<br />Tus momentos.<br /><span>Nuestra comunidad.</span></h2><p>Cada idea tiene una historia. Comparte la tuya y forma parte de los recuerdos de este evento.</p><div className="senati-actions">{event.status === 'ACTIVE' ? <Link href={`/e/${event.code}/upload`} className="btn btn-primary">Compartir un momento ↗</Link> : <Link href={`/e/${event.code}/photos`} className="btn btn-primary">Explorar los recuerdos ↗</Link>}</div></div>
+        <RobotSenati />
+      </section>
       <div className="senati-collage">
         <CollageGeometrico photos={photos} interactive />
         {!photos.length && <div className="senati-empty"><span>SENATI TEC</span><p>{loading ? 'Cargando recuerdos…' : 'El próximo recuerdo lo compartes tú.'}</p></div>}

@@ -5,10 +5,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        paper: '#F2F3EF',
-        ink: '#17191C',
-        muted: '#6B7075',
-        line: '#DCDED8',
+        paper: '#F5F8FE',
+        ink: '#102451',
+        muted: '#5D6E87',
+        line: '#DCE5F3',
         brand: 'rgb(var(--brand-rgb) / <alpha-value>)',
         onbrand: 'rgb(var(--on-brand-rgb) / <alpha-value>)',
       },
