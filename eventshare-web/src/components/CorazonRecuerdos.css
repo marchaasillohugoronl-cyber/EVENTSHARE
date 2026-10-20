@@ -1,0 +1,227 @@
+/* ===== Collage en forma de corazón ===== */
+.heart-stage {
+  --heart-ink: #f3fbff;
+  --heart-filter: none;      /* pon grayscale(1) para blanco y negro */
+  --heart-piece-bg: #102a42; /* fondo mientras carga cada foto */
+  --heart-fade-ms: 520ms;
+
+  height: 100%;
+  display: grid;
+  place-items: center;
+  position: relative;
+  container-type: size;
+  background:
+    radial-gradient(ellipse at 50% 38%, rgb(28 192 241 / .24) 0%, transparent 40%),
+    radial-gradient(ellipse at 14% 90%, rgb(44 104 223 / .22) 0%, transparent 35%),
+    linear-gradient(135deg, #071525 0%, #060b16 48%, #0a1830 100%);
+  overflow: hidden;
+}
+
+/* El título fijo de PantallaTv duplicaría el nombre junto al logo. */
+.tv-screen:has(.heart-stage) .tv-event-label { display: none; }
+
+.heart-frame {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 0;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  animation: heart-frame-in 900ms cubic-bezier(.22, 1, .36, 1) both;
+}
+.heart-stage::before {
+  content: '';
+  position: absolute;
+  inset: 1.8cqh;
+  border: 1px solid rgb(185 233 255 / .14);
+  border-radius: clamp(18px, 2.2cqh, 32px);
+  pointer-events: none;
+}
+.heart-stage::after {
+  content: '';
+  position: absolute;
+  width: min(76cqw, 104cqh);
+  aspect-ratio: 1;
+  border: 1px solid rgb(126 216 255 / .1);
+  border-radius: 50%;
+  transform: translateY(-2cqh);
+  pointer-events: none;
+}
+
+/* Marca sutil de la pantalla, sin barra de navegación ni elementos web. */
+.heart-brand {
+  position: absolute;
+  z-index: 3;
+  top: 4cqh;
+  left: 5cqw;
+  display: inline-flex;
+  align-items: center;
+  gap: .7cqh;
+  color: var(--heart-ink);
+  font-family: var(--font-sans), Arial, sans-serif;
+  font-size: clamp(12px, 2cqh, 22px);
+  font-weight: 800;
+  letter-spacing: -.04em;
+  opacity: .92;
+}
+.heart-brand svg { width: 1.75em; height: 1.75em; fill: #38d5ff; filter: drop-shadow(0 .25cqh .7cqh rgb(56 213 255 / .35)); }
+.heart-meta {
+  position: absolute;
+  z-index: 3;
+  top: 4.6cqh;
+  right: 5cqw;
+  display: inline-flex;
+  align-items: center;
+  gap: .65cqh;
+  color: rgb(221 245 255 / .72);
+  font-size: clamp(10px, 1.4cqh, 15px);
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.heart-live-dot { width: .9cqh; height: .9cqh; min-width: 7px; min-height: 7px; border-radius: 50%; background: #38d5ff; box-shadow: 0 0 0 .45cqh rgb(56 213 255 / .16); animation: heart-pulse 2s ease-in-out infinite; }
+.heart-stage.is-paused .heart-live-dot { animation-play-state: paused; opacity: .45; }
+
+.heart-collage {
+  position: relative;
+  width: min(94cqh, 72cqw);
+  aspect-ratio: 100 / 86;
+  flex: none;
+  z-index: 1;
+  transform: translateY(-1cqh);
+  filter: drop-shadow(0 3cqh 4cqh rgb(0 0 0 / .35));
+}
+
+.heart-piece {
+  position: absolute;
+  overflow: hidden;
+  /* degradado sutil: evita un bloque plano mientras carga la imagen */
+  background: linear-gradient(135deg, var(--heart-piece-bg), color-mix(in srgb, var(--heart-piece-bg) 70%, #000));
+  contain: paint;
+  outline: 1px solid rgb(255 255 255 / .05);
+  transform-origin: center;
+  transition: box-shadow 220ms ease;
+}
+.heart-piece.is-updating { box-shadow: 0 0 0 1px rgb(87 222 255 / .8), 0 0 2cqh rgb(56 213 255 / .55); z-index: 2; }
+.heart-stage.is-starting .heart-piece { opacity: 0; }
+.heart-piece img,
+.heart-piece video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: var(--heart-filter);
+  animation: heart-fade var(--heart-fade-ms) cubic-bezier(.22, 1, .36, 1) both;
+  will-change: opacity, transform;
+}
+
+.heart-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  shape-rendering: geometricPrecision;
+  transform-origin: center;
+}
+.heart-lines polygon {
+  fill: none;
+  stroke: rgb(215 247 255 / .84);
+  stroke-width: .5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  filter: drop-shadow(0 .12cqh .22cqh rgb(0 0 0 / .28));
+}
+
+.heart-title {
+  font-family: var(--font-sans), Arial, sans-serif;
+  font-style: normal;
+  font-weight: 850;
+  font-size: clamp(24px, 5cqh, 66px);
+  line-height: .98;
+  letter-spacing: -.045em;
+  color: var(--heart-ink);
+  text-align: center;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  max-height: 10cqh;
+  /* recorte limpio con puntos suspensivos en lugar de cortar a la mitad */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  text-transform: none;
+}
+
+.heart-heading { position: absolute; z-index: 3; bottom: 3.6cqh; left: 50%; width: min(90cqw, 900px); transform: translateX(-50%); display: grid; justify-items: center; gap: .8cqh; animation: heart-title-in 800ms 720ms cubic-bezier(.22, 1, .36, 1) both; }
+.heart-heading-rule { width: 7cqh; height: .35cqh; min-height: 2px; max-height: 4px; background: #38d5ff; box-shadow: 0 0 1.6cqh rgb(56 213 255 / .55); }
+.heart-kicker { color: rgb(196 238 255 / .72); font-family: var(--font-sans), sans-serif; font-size: clamp(9px, 1.35cqh, 15px); font-weight: 750; letter-spacing: .17em; text-transform: uppercase; }
+.heart-heading p { color: #8ce5ff; font-family: var(--font-sans), sans-serif; font-size: clamp(10px, 1.6cqh, 18px); font-weight: 650; letter-spacing: .025em; }
+
+.heart-empty {
+  margin: auto;
+  padding: 2rem;
+  max-width: 32ch;
+  text-align: center;
+  text-wrap: balance;
+  color: #fff;
+  opacity: .8;
+  font-size: clamp(16px, 2vw, 28px);
+}
+
+.heart-pause {
+  position: absolute;
+  z-index: 5;
+  left: max(24px, env(safe-area-inset-left));
+  bottom: max(24px, env(safe-area-inset-bottom));
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 13px;
+  border: 1px solid rgb(255 255 255 / .2);
+  border-radius: 999px;
+  background: rgb(4 19 36 / .58);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  opacity: .5;
+  transition: opacity .2s, background-color .2s, border-color .2s;
+}
+.heart-pause:hover,
+.heart-pause:focus-visible { opacity: 1; }
+.heart-pause:hover { background: #000e; border-color: #ffffff90; }
+.heart-pause:focus-visible { outline: 2px solid #ffd166; outline-offset: 3px; }
+.heart-pause[aria-pressed='true'] { opacity: .9; }
+.heart-pause > span:first-child { display: inline-grid; place-items: center; width: 12px; font-size: 11px; line-height: 1; }
+
+/* En pantallas táctiles no hay hover: mantenlo más visible */
+@media (hover: none) {
+  .heart-pause { opacity: .7; }
+}
+
+@keyframes heart-fade {
+  from { opacity: 0; transform: scale(1.035); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes heart-frame-in { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes heart-title-in { from { opacity: 0; transform: translate(-50%, 1.5cqh); } to { opacity: 1; transform: translateX(-50%); } }
+@keyframes heart-pulse { 50% { transform: scale(.72); opacity: .65; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .heart-piece img,
+  .heart-piece video { animation: none; will-change: auto; }
+  .heart-frame, .heart-heading, .heart-live-dot { animation: none; }
+  .heart-pause { transition: none; }
+}

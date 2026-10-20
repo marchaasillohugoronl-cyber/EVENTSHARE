@@ -5,6 +5,7 @@ import Feed from '@/components/Muro';
 import { getEventByCodeCached } from '@/server/eventos';
 import { formatDate } from '@/lib/formato';
 import type { PublicEvent } from '@/lib/tipos';
+import PortadaSenati from '@/components/PortadaSenati';
 import { esMatrimonio } from '@/lib/temaEvento';
 import PortadaMatrimonio from '@/components/PortadaMatrimonio';
 
@@ -18,7 +19,7 @@ export default async function EventPage({ params }: { params: Promise<{ code: st
 
   return (
     <>
-      {matrimonio ? <PortadaMatrimonio event={event} /> : <><header className="event-header">
+      {event.theme === 'SENATI_TEC' ? <PortadaSenati event={event} /> : matrimonio ? <PortadaMatrimonio event={event} /> : <><header className="event-header">
         {event.coverImageUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={event.coverImageUrl} alt="Portada del evento" className="event-cover" />

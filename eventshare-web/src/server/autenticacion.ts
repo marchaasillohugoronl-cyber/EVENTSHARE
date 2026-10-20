@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { SignJWT, jwtVerify } from 'jose';
 import bcrypt from 'bcryptjs';
 import crypto from 'node:crypto';
+import { esAdministrador, type Role } from '@/lib/permisos';
 import { env } from './entorno';
 import { query, queryOne } from './baseDatos';
 import { ApiError, forbidden } from './http';
@@ -11,7 +12,7 @@ const ACCESS_TTL_SEC = 15 * 60;
 const GUEST_TTL_SEC = 30 * 24 * 3600;
 const REFRESH_TTL_SEC = 30 * 24 * 3600;
 
-export type Role = 'ADMIN' | 'GUEST';
+export type { Role } from '@/lib/permisos';
 export type AuthUser = { id: string; role: Role; name: string; email: string | null; avatarUrl: string | null };
 
 const secret = () => new TextEncoder().encode(env.jwtAccessSecret);
@@ -63,7 +64,7 @@ export async function requireAuth(req: NextRequest): Promise<AuthUser> {
 
 export async function requireAdmin(req: NextRequest): Promise<AuthUser> {
   const u = await requireAuth(req);
-  if (u.role !== 'ADMIN') throw forbidden('Solo administradores');
+  if (!esAdministrador(u.role)) throw forbidden('Solo administradores');
   return u;
 }
 
@@ -102,13 +103,14 @@ export async function revokeRefreshToken(token: string) {
 
 /** Sesión de invitado del navegador: cookie httpOnly de larga duración. */
 export async function setGuestCookie(res: NextResponse, user: { id: string; role: Role }) {
-  const token = await signToken(user.id, user.role, GUEST_TTL_SEC);
+  const ttl = user.role === 'GUEST' ? GUEST_TTL_SEC : 7 * 24 * 3600;
+  const token = await signToken(user.id, user.role, ttl);
   res.cookies.set(SESSION_COOKIE, token, {
     httpOnly: true,
     secure: env.isProd,
     sameSite: 'lax',
     path: '/',
-    maxAge: GUEST_TTL_SEC,
+    maxAge: ttl,
   });
 }
 

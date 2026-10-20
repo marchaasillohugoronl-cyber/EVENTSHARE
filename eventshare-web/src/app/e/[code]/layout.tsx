@@ -28,8 +28,8 @@ export default async function EventLayout({ children, params }: Props) {
   }
 
   return (
-    <div style={themeVars(esMatrimonio(ev.name) ? '#D8BB76' : ev.primaryColor) as React.CSSProperties} className={`min-h-screen pb-28 ${esMatrimonio(ev.name) ? 'wedding-event' : ''}`}>
-      <div className="mx-auto max-w-xl">{children}</div>
+    <div style={themeVars(ev.theme === 'SENATI_TEC' ? '#0756A6' : esMatrimonio(ev.name) ? '#D8BB76' : ev.primaryColor) as React.CSSProperties} className={`min-h-screen pb-36 ${ev.theme === 'SENATI_TEC' ? 'senati-event' : esMatrimonio(ev.name) ? 'wedding-event' : ''}`}>
+      <div className={`mx-auto ${ev.theme === 'SENATI_TEC' ? 'max-w-6xl' : 'max-w-xl'}`}>{children}</div>
       <EventNav code={ev.code} canPost={ev.status === 'ACTIVE'} />
     </div>
   );

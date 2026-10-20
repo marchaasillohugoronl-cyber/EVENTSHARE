@@ -1,3 +1,4 @@
+import { puedeUsarTema } from '@/lib/permisos';
 import { api, ApiError, forbidden, json, parse } from '@/server/http';
 import { eventCreateSchema } from '@/server/validacion';
 import { queryOne, isUniqueViolation } from '@/server/baseDatos';
@@ -9,17 +10,19 @@ import { publicUrl, verifyUploadedImage } from '@/server/almacenamiento';
 export const POST = api(async (req) => {
   const admin = await requireAdmin(req);
   const b = await parse(req, eventCreateSchema);
+  const theme = b.theme ?? 'STANDARD';
+  if (!puedeUsarTema(admin.role, theme)) throw forbidden('Solo el superadministrador puede crear eventos Senati Tec');
   if (b.coverKey && !b.coverKey.startsWith(`covers/${admin.id}/`)) throw forbidden('Portada inválida');
   if (b.coverKey) await verifyUploadedImage(b.coverKey);
 
   for (let attempt = 0; attempt < 5; attempt++) {
     try {
       const row = await queryOne<EventRow>(
-        `INSERT INTO eventos (owner_id, name, description, cover_image_url, primary_color, event_code, event_date, moderation_enabled)
-         VALUES ($1, $2, $3, $4, COALESCE($5, '#1F2937'), $6, $7, COALESCE($8, true)) RETURNING *`,
+        `INSERT INTO eventos (owner_id, name, description, cover_image_url, primary_color, event_code, event_date, moderation_enabled, theme)
+         VALUES ($1, $2, $3, $4, COALESCE($5, '#1F2937'), $6, $7, COALESCE($8, true), $9) RETURNING *`,
         [
           admin.id, b.name, b.description || null, b.coverKey ? publicUrl(b.coverKey) : null,
-          b.primaryColor ?? null, generateEventCode(), b.eventDate ?? null, b.moderationEnabled ?? null,
+          b.primaryColor ?? null, generateEventCode(), b.eventDate ?? null, b.moderationEnabled ?? null, theme,
         ]
       );
       return json({ event: toEvent(row!) }, 201);

@@ -1,5 +1,6 @@
 'use client';
 
+import { validarVideo } from '@/lib/video';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -15,7 +16,6 @@ export default function UploadForm({ event }: { event: PublicEvent }) {
   const { ensureIdentity } = useSession();
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-  const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +37,7 @@ export default function UploadForm({ event }: { event: PublicEvent }) {
   }
 
   async function publish() {
-    if (!file && !message.trim()) return setError('Agrega una foto o escribe un mensaje.');
+    if (!file) return setError('Agrega una foto o un video.');
     if (!(await ensureIdentity(event.code))) return;
     setBusy(true);
     setError(null);
@@ -45,13 +45,13 @@ export default function UploadForm({ event }: { event: PublicEvent }) {
     try {
       let key: string | undefined;
       if (file) {
-        const blob = await prepareImage(file);
+        const blob = file.type.startsWith('video/') ? await validarVideo(file) : await prepareImage(file);
         const p = await api<Presign>(`/events/${event.id}/uploads`, { method: 'POST', json: { contentType: blob.type, size: blob.size } });
         await uploadWithProgress(p.uploadUrl, blob, p.fields, setProgress);
         key = p.key;
       }
       const r = await api<{ post: Post; requiresApproval: boolean }>(`/events/${event.id}/posts`, {
-        method: 'POST', json: { photoKey: key, message: message.trim() || undefined },
+        method: 'POST', json: { photoKey: key },
       });
       if (r.requiresApproval) setPending(true);
       else router.push(`/e/${event.code}`);
@@ -64,8 +64,8 @@ export default function UploadForm({ event }: { event: PublicEvent }) {
   if (pending) {
     return (
       <div className="py-16 text-center">
-        <p className="font-serif text-3xl">Publicado</p>
-        <p className="mx-auto mt-3 max-w-xs text-muted">Tu publicación aparecerá en el muro cuando el anfitrión la apruebe.</p>
+        <p className="font-serif text-3xl">Recibido · Pendiente de aprobación</p>
+        <p className="mx-auto mt-3 max-w-xs text-muted">Tu publicación se guardó correctamente. Aparecerá en el muro y en la TV cuando el anfitrión la apruebe. No necesitas volver a subirla.</p>
         <Link href={`/e/${event.code}`} className="btn btn-primary mt-8">Volver al muro</Link>
       </div>
     );
@@ -74,15 +74,16 @@ export default function UploadForm({ event }: { event: PublicEvent }) {
   return (
     <div>
       <h1 className="font-serif text-3xl">Comparte un momento</h1>
+      <p className="mt-2 text-sm text-muted">Fotos o videos de hasta 10 segundos · MP4, WebM o MOV · Máximo 50 MB por video.</p>
 
       <input ref={cameraRef} type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden onChange={onPick} />
-      <input ref={galleryRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={onPick} />
+      <input ref={galleryRef} type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" hidden onChange={onPick} />
 
       {preview ? (
         <div className="mt-6 bg-white p-2.5 shadow-[0_10px_24px_-14px_rgba(0,0,0,0.35)]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={preview} alt="Vista previa de tu foto" className="max-h-[60vh] w-full object-contain" />
-          <button className="mt-2 h-10 px-2 text-sm text-muted underline" onClick={() => setFile(null)} disabled={busy}>Quitar foto</button>
+          {file?.type.startsWith('video/') ? <video src={preview} controls playsInline className="max-h-[60vh] w-full" /> : <img src={preview} alt="Vista previa de tu foto" className="max-h-[60vh] w-full object-contain" />}
+          <button className="mt-2 h-10 px-2 text-sm text-muted underline" onClick={() => setFile(null)} disabled={busy}>Quitar archivo</button>
         </div>
       ) : (
         <div className="mt-6 grid grid-cols-2 gap-3">
@@ -97,10 +98,6 @@ export default function UploadForm({ event }: { event: PublicEvent }) {
         </div>
       )}
 
-      <label htmlFor="msg" className="mt-6 block text-sm font-medium">Mensaje (opcional)</label>
-      <textarea id="msg" rows={3} maxLength={500} value={message} onChange={(e) => setMessage(e.target.value)}
-        className="mt-2 w-full rounded-xl border border-line bg-white p-4 text-base outline-none focus:border-ink" placeholder="Escribe unas palabras para los anfitriones" />
-
       {busy && file && (
         <div className="mt-4" role="status" aria-live="polite">
           <div className="h-1.5 overflow-hidden rounded-full bg-line"><div className="h-full bg-brand transition-all" style={{ width: `${progress}%` }} /></div>
@@ -109,7 +106,7 @@ export default function UploadForm({ event }: { event: PublicEvent }) {
       )}
       {error && <p role="alert" className="mt-4 text-sm text-red-700">{error}</p>}
 
-      <button className="btn btn-primary mt-6 w-full" onClick={publish} disabled={busy || (!file && !message.trim())}>
+      <button className="btn btn-primary mt-6 w-full" onClick={publish} disabled={busy || !file}>
         {busy ? 'Publicando…' : 'Publicar'}
       </button>
       {event.moderationEnabled && <p className="mt-3 text-center text-sm text-muted">Los anfitriones revisan las publicaciones antes de mostrarlas.</p>}

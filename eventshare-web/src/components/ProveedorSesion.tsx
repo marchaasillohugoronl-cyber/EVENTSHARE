@@ -8,11 +8,12 @@ import IdentityForm from './FormularioIdentidad';
 type Ctx = {
   user: User | null;
   ready: boolean;
+  setSession: (user: User | null) => void;
   /** Devuelve true si el usuario ya tiene identidad o la crea en el momento (Google / invitado). */
   ensureIdentity: (eventCode: string) => Promise<boolean>;
 };
 
-const SessionContext = createContext<Ctx>({ user: null, ready: false, ensureIdentity: async () => false });
+const SessionContext = createContext<Ctx>({ user: null, ready: false, setSession: () => {}, ensureIdentity: async () => false });
 export const useSession = () => useContext(SessionContext);
 
 export default function SessionProvider({ children }: { children: React.ReactNode }) {
@@ -46,7 +47,7 @@ export default function SessionProvider({ children }: { children: React.ReactNod
   }, []);
 
   return (
-    <SessionContext.Provider value={{ user, ready, ensureIdentity }}>
+    <SessionContext.Provider value={{ user, ready, ensureIdentity, setSession: setUser }}>
       {children}
       {sheet && (
         <div className="fixed inset-0 z-50 flex items-end bg-ink/50 sm:items-center sm:justify-center" onClick={() => finish(null)}>

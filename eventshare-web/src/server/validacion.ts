@@ -10,6 +10,9 @@ const email = z.string().email().max(254).transform((s) => s.toLowerCase().trim(
 const hexColor = z.string().regex(/^#[0-9A-Fa-f]{6}$/);
 
 export const ALLOWED_IMAGE_TYPES = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' } as const;
+export const ALLOWED_VIDEO_TYPES = { 'video/mp4': 'mp4', 'video/webm': 'webm', 'video/quicktime': 'mov' } as const;
+export const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
+export const MAX_VIDEO_SECONDS = 10;
 export const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
 
 export const registerSchema = z.object({ name: text(1, 80), email, password: z.string().min(8).max(128) });
@@ -23,6 +26,7 @@ export const eventCreateSchema = z.object({
   description: text(0, 1000).optional(),
   eventDate: z.string().datetime({ offset: true }).nullable().optional(),
   primaryColor: hexColor.optional(),
+  theme: z.enum(['STANDARD', 'SENATI_TEC']).optional(),
   moderationEnabled: z.boolean().optional(),
   coverKey: z.string().max(300).optional(),
 });
@@ -34,6 +38,10 @@ export const uploadSchema = z.object({
   contentType: z.enum(['image/jpeg', 'image/png', 'image/webp']),
   size: z.number().int().positive().max(MAX_PHOTO_BYTES),
 });
+export const mediaUploadSchema = z.union([uploadSchema, z.object({
+  contentType: z.enum(['video/mp4', 'video/webm', 'video/quicktime']),
+  size: z.number().int().positive().max(MAX_VIDEO_BYTES),
+})]);
 export const postCreateSchema = z
   .object({ photoKey: z.string().max(300).optional(), message: text(0, 500).optional() })
   .refine((v) => !!v.photoKey || !!v.message, { message: 'Agrega una foto o un mensaje' });

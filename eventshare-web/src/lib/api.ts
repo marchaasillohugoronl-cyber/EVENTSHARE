@@ -16,6 +16,13 @@ export async function api<T>(path: string, init: Init = {}): Promise<T> {
   });
   const data = await res.json().catch(() => null);
   if (!res.ok) {
+    if (res.status === 429) {
+      const seconds = Number(res.headers.get('Retry-After'));
+      const wait = Number.isFinite(seconds) && seconds > 0
+        ? `Espera ${Math.ceil(seconds / 60)} minuto(s) antes de volver a intentarlo.`
+        : 'Espera unos minutos antes de volver a intentarlo.';
+      throw new ApiClientError(429, data?.error?.code ?? 'RATE_LIMITED', `Demasiados intentos. ${wait}`);
+    }
     throw new ApiClientError(res.status, data?.error?.code ?? 'ERROR', data?.error?.message ?? 'Ocurrió un error. Inténtalo de nuevo.');
   }
   return data as T;

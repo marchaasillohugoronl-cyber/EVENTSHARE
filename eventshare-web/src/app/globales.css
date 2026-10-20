@@ -1,3 +1,10 @@
+@import '../components/CollageGeometrico.css';
+@import '../components/RuedaRecuerdos.css';
+@import '../components/TunelRecuerdos.css';
+@import '../components/CorazonRecuerdos.css';
+@import '../components/MuroAscendente.css';
+@import '../components/TrioEnmarcado.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,6 +18,7 @@ html { -webkit-text-size-adjust: 100%; }
 body {
   @apply bg-paper font-sans text-ink antialiased;
   -webkit-tap-highlight-color: transparent;
+  letter-spacing: 0;
 }
 
 :focus-visible { outline: 2px solid rgb(var(--brand-rgb)); outline-offset: 3px; }
@@ -23,11 +31,9 @@ body {
 .btn svg { flex-shrink: 0; }
 .btn-primary { @apply bg-brand text-onbrand; box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.16), 0 3px 8px rgb(var(--brand-rgb) / 0.14); }
 .btn-ghost { @apply border border-ink/15 bg-white text-ink; box-shadow: 0 1px 2px rgb(23 25 28 / 0.03); }
-.field { @apply h-12 w-full rounded-xl border border-line bg-white px-4 text-base outline-none focus:border-ink; }
+.field { @apply h-12 w-full rounded-xl border border-line bg-white px-4 text-base outline-none focus:border-ink; transition: border-color 180ms ease, box-shadow 180ms ease; }
 
-body { letter-spacing: 0; }
 .btn:disabled { cursor: not-allowed; }
-.field { transition: border-color 180ms ease, box-shadow 180ms ease; }
 .field:focus-visible { outline: 2px solid rgb(var(--brand-rgb) / 0.35); outline-offset: 3px; box-shadow: 0 0 0 5px rgb(var(--brand-rgb) / 0.06); }
 .page-enter { animation: page-fade 480ms ease; }
 .intro > * { animation: elegant-entry 650ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
@@ -39,8 +45,7 @@ body { letter-spacing: 0; }
 .photo-link img { transition: transform 450ms cubic-bezier(0.2, 0.7, 0.2, 1); }
 .post-actions > * { transition: background-color 180ms ease, color 180ms ease; }
 .event-nav { box-shadow: 0 -4px 24px rgb(23 25 28 / 0.04); }
-.nav-item { position: relative; transition: color 180ms ease, background-color 180ms ease; }
-.nav-item { border-radius: 8px; }
+.nav-item { position: relative; transition: color 180ms ease, background-color 180ms ease; border-radius: 8px; }
 .nav-item[aria-current='page'] { background: rgb(var(--brand-rgb) / 0.07); }
 .nav-upload { min-height: 48px; flex-shrink: 0; }
 .nav-upload[aria-current='page'] { outline: 2px solid rgb(var(--brand-rgb) / 0.25); outline-offset: 3px; }
@@ -54,6 +59,7 @@ body { letter-spacing: 0; }
 @keyframes page-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes elegant-entry { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @keyframes loading-pulse { 50% { opacity: 0.3; transform: scale(0.75); } }
+
 .wedding-hero { position: relative; display: grid; background: #101110; color: #faf8f2; overflow: hidden; }
 .wedding-hero--photos { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); }
 .wedding-invitation { min-width: 0; padding: 28px 18px 32px; text-align: center; align-self: center; animation: elegant-entry 700ms ease both; }
@@ -97,3 +103,67 @@ body { letter-spacing: 0; }
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   .btn:not(:disabled):hover, .photo-link:hover img, .wedding-frame:hover img { transform: none; }
 }
+
+/* Senati Tec: collage geométrico inspirado en la referencia del evento. */
+.senati-event { background: #f3f6fa; color: #102e50; }
+.senati-hero { background: white; }
+.senati-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 30px 32px 22px; }
+.senati-kicker { font-size: 10px; font-weight: 700; letter-spacing: .16em; color: #497091; }
+.senati-heading h1 { font-size: clamp(28px, 5vw, 52px); font-weight: 850; letter-spacing: -.045em; line-height: 1.15; margin-top: 8px; }
+.senati-edition { border-left: 3px solid #148ec0; padding-left: 14px; font-size: 10px; font-weight: 700; letter-spacing: .12em; }
+.senati-collage { position: relative; overflow: hidden; background: #123c70; }
+.senati-collage svg { width: 100%; max-height: 65vh; display: block; }
+.senati-collage a:focus-visible { outline: 6px solid #ffda69; }
+.senati-collage-caption { position: absolute; bottom: 12px; left: 16px; background: #fff; color: #163c67; padding: 8px 12px; border-radius: 3px; font-size: 9px; font-weight: 750; letter-spacing: .1em; pointer-events: none; }
+.senati-empty { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 27%; color: white; text-align: center; pointer-events: none; }
+.senati-empty span { font-size: clamp(12px, 2.8vw, 30px); font-weight: 800; }
+.senati-empty p { font-size: clamp(9px, 1.4vw, 14px); margin-top: 8px; }
+.senati-bottom { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding: 28px 32px; }
+.senati-intro { max-width: 700px; }
+.senati-intro h2 { font-size: clamp(24px, 3vw, 34px); font-weight: 750; letter-spacing: -.04em; margin: 7px 0 12px; }
+.senati-intro > p:not(.senati-kicker) { margin-top: 8px; }
+.senati-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.senati-note { font-size: 12px; color: #58718b; }
+.senati-qr { flex-shrink: 0; position: relative; }
+.senati-qr summary { cursor: pointer; list-style: none; text-align: center; font-size: 10px; }
+.senati-qr summary::-webkit-details-marker { display: none; }
+.senati-qr summary img { margin: auto; }
+.senati-qr summary small { color: #59738e; text-decoration: underline; }
+.senati-qr[open] > img { width: 256px; max-width: 70vw; }
+.senati-event .post-card { max-width: 700px; margin-left: auto; margin-right: auto; }
+@media (max-width: 600px) {
+  .senati-heading { padding: 24px 18px 18px; }
+  .senati-bottom { padding: 22px 18px; gap: 10px; flex-wrap: wrap; }
+  .senati-qr { margin-left: auto; }
+  .senati-actions .btn { font-size: 13px; }
+}
+.wedding-event .event-nav footer { color: #c4c0b5; }
+
+/* Pantalla de TV */
+.tv-screen { position: relative; width: 100%; height: 100dvh; overflow: hidden; background: #080e1b; color: white; }
+.tv-stage { position: relative; height: 100dvh; min-width: 0; overflow: hidden; }
+.tv-slide { width: 100%; height: 100%; }
+
+.tv-media { width: 100%; height: 100%; object-fit: contain; }
+.tv-caption { position: absolute; bottom: 0; inset-inline: 0; padding: 5rem 3rem 2rem; background: linear-gradient(transparent, #000e); }
+.tv-caption p { font-size: clamp(20px, 2.5vw, 42px); white-space: pre-line; overflow-wrap: anywhere; max-height: 40vh; overflow: hidden; }
+.tv-caption span { display: block; margin-top: 1rem; font-size: clamp(16px, 1.5vw, 26px); color: #cbd5e1; }
+.tv-message { inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 3rem; background: radial-gradient(ellipse at top, #173c65, #080e1b); }
+.tv-message p { max-height: 70vh; }
+.tv-empty { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem; font-size: clamp(24px, 3vw, 50px); }
+.tv-empty p { margin-top: 1rem; font-size: clamp(18px, 1.5vw, 28px); }
+.tv-fullscreen { border: 1px solid #ffffff50; border-radius: 12px; padding: .75rem; }
+
+.tv-event-label { position: absolute; z-index: 5; top: 20px; left: 24px; max-width: 65%; padding: 6px 12px; border-radius: 8px; background: #0005; font-size: clamp(12px, 1.2vw, 20px); text-shadow: 0 1px 5px #000; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tv-qr { position: absolute; z-index: 10; right: max(18px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom)); }
+.tv-qr summary { list-style: none; cursor: pointer; background: white; padding: 5px; border-radius: 10px; color: #172033; box-shadow: 0 4px 20px #0005; }
+.tv-qr summary::-webkit-details-marker, .tv-controls summary::-webkit-details-marker { display: none; }
+.tv-qr summary img { width: clamp(76px, 7vw, 112px); height: auto; border-radius: 5px; }
+.tv-qr summary span { display: block; text-align: center; font-size: 10px; padding-bottom: 3px; }
+.tv-qr-expanded { position: absolute; right: 0; bottom: calc(100% + 12px); width: min(280px, 80vw); padding: 12px; border-radius: 14px; background: white; color: #172033; text-align: center; box-shadow: 0 8px 30px #0006; }
+.tv-qr-expanded img { width: 100%; height: auto; }
+.tv-qr-expanded span { font-size: 12px; letter-spacing: .15em; }
+.tv-controls { position: absolute; z-index: 20; top: 18px; right: 18px; }
+.tv-controls summary { list-style: none; cursor: pointer; display: grid; place-items: center; width: 44px; height: 36px; border: 1px solid #ffffff30; border-radius: 999px; background: #0006; color: white; letter-spacing: 3px; }
+.tv-controls-panel { position: absolute; top: 46px; right: 0; width: min(300px, 90vw); padding: 18px; display: grid; gap: 16px; background: #101a2aee; border: 1px solid #ffffff20; border-radius: 16px; box-shadow: 0 12px 40px #0008; backdrop-filter: blur(16px); }
+.tv-notice { position: absolute; z-index: 5; left: 50%; bottom: 24px; transform: translateX(-50%); max-width: 60%; background: #000a; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #fde68a; }

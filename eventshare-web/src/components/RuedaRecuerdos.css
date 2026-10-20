@@ -1,0 +1,286 @@
+/* ===== Rueda de recuerdos: versión TV ===== */
+.memory-wheel-stage {
+  /* Ajustes rápidos (cqh = % de la altura de la pantalla) */
+  --size: 104;   /* tamaño de la rueda */
+  --cut: calc(var(--size) / 2); /* oculta exactamente la mitad izquierda */
+  --wheel-filter: saturate(1.05) contrast(1.05); /* grayscale(1) para blanco y negro */
+  --brand-rgb: 10 150 210;
+  --on-brand-rgb: 240 250 255;
+
+  height: 100%;
+  display: flex;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  container-type: size;
+  /* Oscurece y desenfoca el fondo del evento para que las fotos destaquen */
+  background: #031831;
+  -webkit-backdrop-filter: blur(14px) brightness(.7);
+  backdrop-filter: blur(14px) brightness(.7);
+}
+
+/* El nombre ya aparece en el centro de la rueda */
+.tv-screen:has(.memory-wheel-stage) .tv-event-label { display: none; }
+
+/* ---- Rueda ---- */
+.memory-wheel-side {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 calc((var(--size) - var(--cut)) * 1cqh);
+  overflow: visible;
+}
+
+.memory-wheel {
+  position: absolute;
+  width: calc(var(--size) * 1cqh);
+  height: calc(var(--size) * 1cqh);
+  left: calc(var(--cut) * -1cqh);
+  top: calc((100 - var(--size)) / 2 * 1cqh);
+  container-type: size;
+}
+
+/* Anillo de luz y cristal oscuro en el hueco (INNER = 30 → inset 20%) */
+.memory-wheel::before {
+  content: '';
+  position: absolute;
+  inset: 20%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(0 0 0 / .5), rgb(0 0 0 / .82));
+  border: 1px solid rgb(255 255 255 / .28);
+  box-shadow:
+    0 0 5cqw rgb(var(--brand-rgb) / .55),
+    inset 0 0 5cqw rgb(var(--brand-rgb) / .35);
+}
+
+.memory-wheel-ring {
+  position: absolute;
+  inset: 0;
+  animation: memory-wheel-turn 150s linear infinite;
+}
+.memory-wheel-ring.is-paused { animation-play-state: paused; }
+.memory-wheel-stage.is-paused .memory-wheel-segment img,
+.memory-wheel-stage.is-paused .memory-wheel-segment video,
+.memory-wheel-stage.is-paused .memory-wheel-ambient,
+.memory-wheel-stage.is-paused .memory-wheel-single figure,
+.memory-wheel-stage.is-paused .memory-wheel-progress { animation-play-state: paused; }
+
+.memory-wheel-segment { position: absolute; background: #000; }
+.memory-wheel-segment img,
+.memory-wheel-segment video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: var(--wheel-filter);
+  animation: memory-wheel-fade 900ms cubic-bezier(.16, 1, .3, 1) both;
+}
+
+.memory-wheel-tag {
+  position: absolute;
+  z-index: 2;
+  padding: .55cqw 1.3cqw;
+  background: rgb(var(--brand-rgb, 0 0 0));
+  color: rgb(var(--on-brand-rgb, 255 255 255));
+  font-family: var(--font-sans), sans-serif;
+  font-size: clamp(9px, 1.1cqw, 20px);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 .4cqw 1.2cqw rgb(0 0 0 / .5);
+}
+
+/* Centro del hueco, calculado con --size y --cut */
+.memory-wheel-center {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: calc(
+    (max(0cqh, (var(--size) * .2 - var(--cut)) * 1cqh) + (var(--size) * .8 - var(--cut)) * 1cqh) / 2
+  );
+  transform: translate(-50%, -50%);
+  width: calc(var(--size) * .26 * 1cqh);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 2.2cqh;
+  color: #fff;
+}
+.memory-wheel-center span {
+  font-size: clamp(10px, 1.7cqh, 18px);
+  letter-spacing: .38em;
+  color: rgb(255 255 255 / .75);
+}
+.memory-wheel-rule { display: block; width: 9cqh; height: 1px; background: rgb(255 255 255 / .55); }
+.memory-wheel-center h2 {
+  font-family: var(--font-serif), serif;
+  font-size: clamp(20px, 5.2cqh, 72px);
+  line-height: 1.12;
+  max-height: 40cqh;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  text-shadow: 0 2px 14px rgb(0 0 0 / .7);
+}
+
+/* ---- Foto o video protagonista ---- */
+.memory-wheel-single {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  place-items: center;
+  margin-left: -7cqh;
+  padding: 8cqh 4cqw 8cqh 7cqh;
+  overflow: visible;
+  isolation: isolate;
+}
+
+/* Resplandor difuminado con los colores de la propia foto */
+.memory-wheel-ambient {
+  position: absolute;
+  inset: -5%;
+  width: 110%;
+  height: 110%;
+  object-fit: cover;
+  z-index: -1;
+  filter: blur(65px) saturate(1.15) brightness(.5);
+  opacity: .3;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 30%);
+  mask-image: linear-gradient(90deg, transparent, #000 30%);
+  animation: memory-wheel-ambient-in 1400ms ease both;
+}
+
+.memory-wheel-single figure {
+  position: relative;
+  grid-area: 1 / 1;
+  z-index: 2;
+  margin: 0;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  border-radius: 2cqh;
+  background: transparent;
+  box-shadow: 0 2cqh 8cqh #00132b55, 0 0 4cqh #28bbff12;
+  mask-image: linear-gradient(90deg, transparent, #000 3%, #000 98%, transparent);
+  animation: memory-wheel-single-in 1100ms cubic-bezier(.16, 1, .3, 1) both;
+}
+.memory-wheel-single figure.memory-wheel-outgoing { z-index: 1; animation: memory-wheel-single-out 900ms ease-out both; pointer-events: none; }
+.memory-wheel-single figure:not(.memory-wheel-outgoing) > img { animation: memory-wheel-photo-drift 9s ease-out both; }
+.memory-wheel-single figure img,
+.memory-wheel-single figure video {
+  display: block;
+  width: auto;
+  height: auto;
+  min-height: 0;
+  max-width: 100%;
+  max-height: 84cqh;
+  object-fit: contain;
+}
+.memory-wheel-single figcaption {
+  position: absolute;
+  left: 0;
+  bottom: .6cqh;
+  padding: 1cqh 2.4cqh;
+  background: rgb(var(--brand-rgb, 0 0 0));
+  color: rgb(var(--on-brand-rgb, 255 255 255));
+  border-radius: 0 12px 12px 0;
+  font-family: var(--font-sans), sans-serif;
+  font-size: clamp(11px, 1.8cqh, 22px);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+.memory-wheel-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: .6cqh;
+  background: rgb(255 255 255 / .85);
+  transform-origin: left;
+  animation: memory-wheel-progress linear both;
+}
+.memory-wheel-preload { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+
+/* ---- Estado vacío y botón ---- */
+.memory-wheel-empty {
+  margin: auto;
+  padding: 2rem;
+  text-align: center;
+  color: #fff;
+  opacity: .8;
+  font-size: clamp(16px, 2vw, 28px);
+}
+.memory-wheel-pause {
+  position: absolute;
+  z-index: 5;
+  left: max(24px, env(safe-area-inset-left));
+  bottom: max(24px, env(safe-area-inset-bottom));
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid rgb(157 229 255 / .28);
+  border-radius: 999px;
+  background: rgb(4 20 37 / .58);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: #e9faff;
+  font-size: 12px;
+  opacity: .55;
+  transition: opacity .2s, border-color .2s;
+}
+.memory-wheel-pause:hover,
+.memory-wheel-pause:focus-visible { opacity: 1; border-color: #62dfff; }
+
+@keyframes memory-wheel-turn { to { transform: rotate(360deg); } }
+@keyframes memory-wheel-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes memory-wheel-single-in { from { opacity: 0; transform: translateX(2cqh) scale(.985); } to { opacity: 1; transform: none; } }
+@keyframes memory-wheel-single-out { from { opacity: 1; } to { opacity: 0; transform: translateX(-1.2cqh) scale(1.012); } }
+@keyframes memory-wheel-photo-drift { from { transform: scale(1.01); } to { transform: scale(1.035); } }
+@keyframes memory-wheel-ambient-in { from { opacity: 0; } to { opacity: .3; } }
+@keyframes memory-wheel-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* Fondo de IA conservado en la pantalla y dentro del círculo. */
+.memory-wheel-stage::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -6px;
+  background: linear-gradient(90deg, #052c5a85, #03152f55 55%, #03152f75), url('/images/fondo-ia-senati.webp') center / cover no-repeat;
+  filter: blur(1.5px);
+  pointer-events: none;
+}
+.memory-wheel-stage::after {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: url('/images/circuitos-senati.svg') center / 420px 300px repeat;
+  opacity: .3;
+  mask-image: linear-gradient(90deg, #000, #0009 55%, #000);
+  pointer-events: none;
+}
+
+.memory-wheel-backdrop {
+  position: absolute;
+  inset: 20%;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 1px solid #83d8ff65;
+  box-shadow: 0 0 25px #008dff35;
+}
+.memory-wheel-backdrop::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  background: url('/images/circuitos-senati.svg') center / 290px 210px repeat, url('/images/fondo-ia-senati.webp') center / cover no-repeat;
+  filter: blur(.6px);
+}
+.memory-wheel-backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #03244e45 10%, #03244e85 45%, #02172dd9 100%);
+}

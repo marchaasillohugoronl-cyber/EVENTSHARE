@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import LandingForm from '@/components/FormularioInicio';
 
 export default function Home() {
@@ -7,6 +8,7 @@ export default function Home() {
       <h1 className="font-serif text-4xl leading-[1.12] sm:text-5xl">Todas las fotos de la fiesta, en un solo lugar.</h1>
       <p className="mt-6 max-w-md text-lg text-muted">Escanea el código QR de tu evento, o escribe el código que te dieron los anfitriones.</p>
       <LandingForm />
+      <Link href="/crear" className="mt-8 text-center text-sm underline underline-offset-4">Crear mis propios eventos ↗</Link>
     </main>
   );
 }

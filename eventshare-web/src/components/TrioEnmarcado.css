@@ -1,0 +1,230 @@
+/* ===== Composición "Senja": tres recortes con marco blanco superpuestos ===== */
+@import url('https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Poppins:wght@500;600&display=swap');
+
+.trio-stage {
+  --ink: #fff;
+  --font-script: 'Kaushan Script', 'Sacramento', cursive;
+  --font-ui: 'Poppins', system-ui, sans-serif;
+
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  container-type: size;
+  isolation: isolate;
+  background: #090b0e url('/fondo-textura-hexadecimal-creacion-redes_23-2150080759.avif') center / cover no-repeat;
+  color: var(--ink);
+}
+
+/* Viñeta: oscurece arriba y abajo para que el texto se lea */
+.trio-shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgb(8 10 14 / .3), transparent 35%, rgb(8 10 14 / .5)),
+    radial-gradient(ellipse at 50% 48%, rgb(230 192 146 / .08), rgb(0 0 0 / .42) 85%);
+}
+
+/* ---------- Textos (ahora visibles, igual que en la foto) ---------- */
+.trio-pause { display: none; }
+.tv-screen:has(.trio-stage) .tv-event-label { display: none; }
+
+.trio-head {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  top: 14cqh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6cqh;
+  padding: 0 8cqw;
+  text-align: center;
+  pointer-events: none;
+}
+/* Título en letra cursiva */
+.trio-head :is(h1, h2, .trio-title) {
+  margin: 0;
+  font-family: var(--font-script);
+  font-weight: 400;
+  font-size: clamp(34px, 8.4cqh, 120px);
+  line-height: 1;
+  letter-spacing: .01em;
+  text-shadow: 0 .3cqh 1.6cqh rgb(0 0 0 / .45);
+}
+/* Subtítulo pequeño y en negrita */
+.trio-head :is(p, .trio-sub) {
+  margin: 0;
+  max-width: 34ch;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: clamp(11px, 1.9cqh, 26px);
+  line-height: 1.35;
+  text-shadow: 0 .2cqh 1cqh rgb(0 0 0 / .6);
+  text-wrap: balance;
+}
+
+/* Cuadro translúcido inferior */
+.trio-caption {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: 10cqh;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 72cqw;
+  padding: 1.4cqh 3.2cqh;
+  background: rgb(20 18 18 / .52);
+  backdrop-filter: blur(3px);
+  font-family: var(--font-ui);
+  font-weight: 500;
+  font-size: clamp(11px, 1.9cqh, 24px);
+  line-height: 1.35;
+  text-align: center;
+  text-shadow: 0 .2cqh .8cqh rgb(0 0 0 / .5);
+  pointer-events: none;
+}
+
+/* Crédito al pie */
+.trio-credit {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  bottom: 2.4cqh;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: clamp(10px, 1.6cqh, 20px);
+  letter-spacing: .03em;
+  text-shadow: 0 .2cqh .8cqh rgb(0 0 0 / .7);
+  pointer-events: none;
+}
+
+/* ---------- Tres rectángulos que se cruzan ---------- */
+/* El central es alto y queda detrás; los laterales se adelantan y bajan un poco. */
+/* Una misma escala limita ancho y alto, incluidos los marcos exteriores.
+   Se adapta al contenedor real, también en vistas incrustadas. */
+.trio-row {
+  --u: min(2.7cqh, 2.2cqw);
+  --frame-line: clamp(1px, calc(var(--u) * .12), 3px);
+  --frame-offset: calc(var(--u) * .7);
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--u) * 42.2);
+  height: calc(var(--u) * 29.2);
+  transform: translate(-50%, -50%);
+}
+.trio-frame {
+  --trio-frame-x: 0%;
+  position: absolute;
+  overflow: visible;
+  width: calc(var(--u) * 14.1);
+  height: calc(var(--u) * 21.2);
+  transform: translateX(var(--trio-frame-x));
+  transform-origin: center;
+  animation: trio-frame-spin 12s linear infinite;
+}
+.trio-frame.is-center {
+  --trio-frame-x: -50%;
+  z-index: 2;
+  left: 50%;
+  top: 0;
+  width: calc(var(--u) * 21.5);
+  height: calc(var(--u) * 29.2);
+}
+.trio-frame.is-left  { z-index: 3; left: 0;  top: calc(var(--u) * 4); }
+.trio-frame.is-right { z-index: 3; right: 0; top: calc(var(--u) * 4); }
+
+/* El borde y la foto giran juntos dentro de la misma tarjeta. */
+.trio-frame::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  inset: calc(var(--frame-offset) * -1);
+  border: var(--frame-line) solid rgb(255 250 242 / .94);
+  pointer-events: none;
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / .08),
+    0 calc(var(--u) * .6) calc(var(--u) * 1.8) rgb(0 0 0 / .24),
+    inset 0 0 calc(var(--u) * .7) rgb(0 0 0 / .12);
+}
+
+/* Cada tarjeta gira sobre su eje vertical, con un ritmo desfasado. */
+.trio-frame.is-left { animation-delay: -3s; }
+.trio-frame.is-right {
+  animation-delay: -6s;
+  animation-direction: reverse;
+}
+
+.trio-photo {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: linear-gradient(145deg, #39332e, #17191d);
+  box-shadow:
+    0 calc(var(--u) * 1.2) calc(var(--u) * 2.8) rgb(0 0 0 / .42),
+    0 0 0 1px rgb(255 255 255 / .14);
+}
+.trio-photo img,
+.trio-photo video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: trio-photo-in 650ms cubic-bezier(.16, 1, .3, 1) both;
+}
+/* Entrada escalonada: central, izquierda, derecha */
+.trio-frame.is-left .trio-photo :is(img, video) { animation-delay: 120ms; }
+.trio-frame.is-right .trio-photo :is(img, video) { animation-delay: 240ms; }
+
+.trio-empty {
+  position: relative;
+  z-index: 2;
+  margin: auto;
+  padding: 2rem;
+  max-width: 32ch;
+  color: #fff;
+  text-align: center;
+  text-wrap: balance;
+  font-family: var(--font-ui);
+  font-size: clamp(16px, 2.5cqmin, 28px);
+  line-height: 1.6;
+}
+
+@keyframes trio-photo-in {
+  from { opacity: 0; transform: scale(1.04); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes trio-frame-spin {
+  from { transform: translateX(var(--trio-frame-x)) perspective(calc(var(--u) * 100)) rotateY(0deg); }
+  to { transform: translateX(var(--trio-frame-x)) perspective(calc(var(--u) * 100)) rotateY(360deg); }
+}
+
+/* ---------- Vertical (como la captura): más ancho, sin cortar tarjetas ---------- */
+@media (max-aspect-ratio: 3 / 4) {
+  .trio-head { top: 12cqh; }
+  .trio-caption { max-width: 78cqw; }
+}
+
+/* ---------- Horizontal (TV): mismas proporciones, más grande ---------- */
+@media (min-aspect-ratio: 1 / 1) {
+  .trio-head { top: 9cqh; }
+  .trio-caption { bottom: 8cqh; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trio-frame { animation: none; }
+  .trio-photo img,
+  .trio-photo video { animation: none; }
+}

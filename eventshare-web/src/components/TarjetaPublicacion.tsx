@@ -1,5 +1,6 @@
 'use client';
 
+import { esVideo } from '@/lib/video';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { api, errorMessage } from '@/lib/api';
@@ -50,15 +51,14 @@ export default function PostCard({ post, code, readOnly = false }: { post: Post;
   const href = `/e/${code}/post/${post.id}`;
   return (
     <article className="post-card bg-white p-2.5 pb-4 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-      {post.photoUrl && (
+      {post.photoUrl && (esVideo(post.photoUrl) ? <video src={post.photoUrl} controls playsInline preload="metadata" className="max-h-[70vh] w-full bg-black" aria-label={`Video de ${post.author.name}`} /> : (
         <Link href={href} className="photo-link block bg-line/50">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={post.photoUrl} alt={post.message ? `Foto de ${post.author.name}: ${post.message}` : `Foto de ${post.author.name}`}
+          <img src={post.photoUrl} alt={`Foto de ${post.author.name}`}
             loading="lazy" decoding="async" className="block h-auto min-h-48 w-full" />
         </Link>
-      )}
+      ))}
       <div className="px-1.5 pt-3">
-        {post.message && <p className="whitespace-pre-line break-words font-serif text-[19px] leading-snug">{post.message}</p>}
         <div className="mt-3 flex flex-wrap items-center gap-2.5">
           <Avatar name={post.author.name} url={post.author.avatarUrl} size={28} />
           <span className="min-w-0 max-w-[45%] truncate text-sm font-medium">{post.author.name}</span>

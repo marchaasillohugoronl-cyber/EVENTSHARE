@@ -1,5 +1,6 @@
 'use client';
 
+import { esVideo } from '@/lib/video';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { api, errorMessage } from '@/lib/api';
@@ -15,7 +16,7 @@ const POLL_MS = 8000;
  */
 export default function Feed({ event, mode = 'feed' }: { event: PublicEvent; mode?: 'feed' | 'grid' }) {
   const limit = mode === 'grid' ? 24 : 10;
-  const base = `/events/${event.id}/posts?limit=${limit}${mode === 'grid' ? '&photos=1' : ''}`;
+  const base = `/events/${event.id}/posts?limit=${limit}&photos=1`;
   const [items, setItems] = useState<Post[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -102,7 +103,7 @@ export default function Feed({ event, mode = 'feed' }: { event: PublicEvent; mod
           {items.map((p) => (
             <Link key={p.id} href={`/e/${event.code}/post/${p.id}`} className="photo-link page-enter relative block aspect-square overflow-hidden bg-line/50">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={p.photoUrl!} alt={`Foto de ${p.author.name}`} loading="lazy" decoding="async" className="h-full w-full object-cover" />
+              {esVideo(p.photoUrl!) ? <><video src={p.photoUrl!} muted playsInline preload="metadata" className="h-full w-full object-cover" /><span className="absolute bottom-2 left-2 rounded bg-black/70 px-2 py-1 text-xs text-white">▶ Video</span></> : <img src={p.photoUrl!} alt={`Foto de ${p.author.name}`} loading="lazy" decoding="async" className="h-full w-full object-cover" />}
             </Link>
           ))}
         </div>

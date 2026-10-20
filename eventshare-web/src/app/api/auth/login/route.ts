@@ -10,7 +10,7 @@ export const POST = api(async (req) => {
   const b = await parse(req, loginSchema);
   await rateLimit(`login-email:${b.email}`, 8, 900);
   const row = await queryOne<any>(
-    `SELECT id, name, email, role, avatar_url, password_hash FROM usuarios WHERE email = $1 AND role = 'ADMIN'`,
+    `SELECT id, name, email, role, avatar_url, password_hash FROM usuarios WHERE email = $1 AND role IN ('ADMIN', 'SUPER_ADMIN')`,
     [b.email]
   );
   const ok = await verifyPassword(b.password, row?.password_hash ?? null);

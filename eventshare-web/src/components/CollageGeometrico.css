@@ -1,0 +1,28 @@
+/* ===== Collage geométrico ===== */
+.geometric-collage { display: block; width: 100%; height: auto; background: #061526; }
+.tv-slide > .geometric-collage { height: 100%; }
+
+/* Entrada escalonada de cada pieza al recomponer el collage */
+.collage-tile {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: collage-in 720ms cubic-bezier(.16, 1, .3, 1) both;
+}
+@keyframes collage-in {
+  from { opacity: 0; transform: translateY(1.2%) scale(.975); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* Interacción solo en piezas con enlace */
+.collage-tile--link a { cursor: pointer; outline: none; }
+.collage-tile--link image { transition: filter 220ms ease, opacity 220ms ease; }
+.collage-tile--link a:hover image,
+.collage-tile--link a:focus-visible image { filter: brightness(1.12) saturate(1.1); }
+
+.collage-focus-ring { pointer-events: none; stroke: transparent; stroke-width: 8; stroke-linejoin: round; }
+.collage-tile--link a:focus-visible .collage-focus-ring { stroke: #ffd166; }
+
+@media (prefers-reduced-motion: reduce) {
+  .collage-tile { animation: none; }
+  .collage-tile--link image { transition: none; }
+}

@@ -1,5 +1,6 @@
 'use client';
 
+import { esVideo } from '@/lib/video';
 import Link from 'next/link';
 import { Camera, Heart, Images } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -12,7 +13,7 @@ export default function PortadaMatrimonio({ event }: { event: PublicEvent }) {
   useEffect(() => {
     let active = true;
     api<Page<Post>>(`/events/${event.id}/posts?limit=4&photos=1`)
-      .then((page) => { if (active) setPhotos(page.items.filter((post) => post.photoUrl)); })
+      .then((page) => { if (active) setPhotos(page.items.filter((post) => post.photoUrl && !esVideo(post.photoUrl))); })
       .catch(() => { /* La portada sigue disponible si el album no responde. */ });
     return () => { active = false; };
   }, [event.id]);

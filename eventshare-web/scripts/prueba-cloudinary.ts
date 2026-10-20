@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import test from 'node:test';
 import dotenv from 'dotenv';
-import { presignUpload, publicUrl, verifyUploadedImage, deleteObject } from '../src/server/almacenamiento';
+import { presignUpload, publicUrl, verifyUploadedImage, verifyUploadedMedia, deleteObject } from '../src/server/almacenamiento';
 import { env } from '../src/server/entorno';
 
 dotenv.config({ path: '.env.local' });
@@ -55,4 +55,32 @@ test('subida firmada, lectura, verificacion y borrado reales', { skip: process.e
     await deleteObject(photoKey);
   }
   await assert.rejects(verifyUploadedImage(photoKey), { code: 'UPLOAD_NOT_FOUND' });
+});
+
+
+test('videos: firma y URL de video, límite de duración y borrado del original inválido', async (t) => {
+  t.mock.getter(env, 'cloudinaryCloudName', () => 'prueba');
+  t.mock.getter(env, 'cloudinaryApiKey', () => 'prueba');
+  t.mock.getter(env, 'cloudinaryApiSecret', () => 'prueba');
+  const videoKey = `events/${randomUUID()}/${randomUUID()}/${randomUUID()}.mp4`;
+  const signed = await presignUpload(videoKey, 'video/mp4', 1024);
+  assert.ok(signed.uploadUrl.endsWith('/video/upload'));
+  assert.ok(publicUrl(videoKey).includes('/video/upload/'));
+  await assert.rejects(presignUpload(videoKey, 'video/mp4', 50 * 1024 * 1024 + 1));
+  await assert.rejects(presignUpload(key().replace('.png', '.mp4'), 'video/mp4', 1024));
+  await assert.rejects(verifyUploadedImage(videoKey));
+  let duration: unknown = 10;
+  const calls: string[] = [];
+  t.mock.method(globalThis, 'fetch', async (url: string | URL | Request) => {
+    calls.push(String(url));
+    if (String(url).endsWith('/destroy')) return Response.json({ result: 'ok' });
+    return Response.json({ public_id: videoKey.replace(/\.mp4$/, ''), resource_type: 'video', type: 'upload', format: 'mp4', bytes: 1024, duration });
+  });
+  await verifyUploadedMedia(videoKey);
+  assert.equal(calls.length, 1);
+  for (const value of [10.01, 0, null, '10']) {
+    duration = value;
+    await assert.rejects(verifyUploadedMedia(videoKey), { code: 'INVALID_UPLOAD' });
+    assert.ok(calls.at(-1)?.endsWith('/video/destroy'));
+  }
 });

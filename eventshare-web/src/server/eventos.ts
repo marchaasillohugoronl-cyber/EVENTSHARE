@@ -18,7 +18,7 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 export type EventRow = {
   id: string; owner_id: string; name: string; description: string | null; cover_image_url: string | null;
   primary_color: string; event_code: string; event_date: Date | null; status: 'ACTIVE' | 'CLOSED' | 'ARCHIVED';
-  moderation_enabled: boolean; created_at: Date;
+  moderation_enabled: boolean; created_at: Date; theme: import('@/lib/permisos').EventTheme;
 };
 
 export function toEvent(e: EventRow) {
@@ -26,6 +26,7 @@ export function toEvent(e: EventRow) {
     id: e.id,
     code: e.event_code,
     name: e.name,
+    theme: e.theme,
     description: e.description,
     coverImageUrl: e.cover_image_url,
     primaryColor: e.primary_color,

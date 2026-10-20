@@ -1,4 +1,4 @@
-export type User = { id: string; name: string; role: 'ADMIN' | 'GUEST'; email: string | null; avatarUrl: string | null };
+export type User = { id: string; name: string; role: import('./permisos').Role; email: string | null; avatarUrl: string | null };
 
 export type PublicEvent = {
   id: string;
@@ -7,6 +7,7 @@ export type PublicEvent = {
   description: string | null;
   coverImageUrl: string | null;
   primaryColor: string;
+  theme: import('./permisos').EventTheme;
   eventDate: string | null;
   status: 'ACTIVE' | 'CLOSED' | 'ARCHIVED';
   moderationEnabled: boolean;

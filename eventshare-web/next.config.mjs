@@ -8,6 +8,8 @@ const securityHeaders = [
 ];
 
 const nextConfig = {
+  // Permite verificar producción sin compartir archivos con next dev.
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   reactStrictMode: true,
   poweredByHeader: false,
   async headers() {

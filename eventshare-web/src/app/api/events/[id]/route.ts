@@ -1,3 +1,4 @@
+import { puedeUsarTema } from '@/lib/permisos';
 import { api, forbidden, json, parse } from '@/server/http';
 import { eventUpdateSchema } from '@/server/validacion';
 import { query, queryOne } from '@/server/baseDatos';
@@ -28,9 +29,12 @@ export const PATCH = api<{ id: string }>(async (req, { params }) => {
   const ev = await requireOwnedEvent(params.id, admin);
   const b = await parse(req, eventUpdateSchema);
 
+  if (!puedeUsarTema(admin.role, ev.theme) || !puedeUsarTema(admin.role, b.theme ?? ev.theme)) throw forbidden('Solo el superadministrador puede administrar el diseño Senati Tec');
+
   const sets: string[] = [];
   const vals: unknown[] = [];
   const add = (col: string, v: unknown) => { vals.push(v); sets.push(`${col} = $${vals.length}`); };
+  if (b.theme !== undefined) add('theme', b.theme);
   if (b.name !== undefined) add('name', b.name);
   if (b.description !== undefined) add('description', b.description || null);
   if (b.eventDate !== undefined) add('event_date', b.eventDate);

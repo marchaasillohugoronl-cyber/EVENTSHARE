@@ -1,0 +1,7 @@
+.memory-tunnel { position: relative; height: 100%; overflow: hidden; background: #030b16; }
+.memory-tunnel-canvas { display: block; width: 100%; height: 100%; }
+.memory-tunnel-title { position: absolute; left: 50%; top: 68%; transform: translate(-50%, -50%); width: 14%; text-align: center; pointer-events: none; }
+.memory-tunnel-title h2 { font-family: var(--font-sans), sans-serif; font-size: clamp(12px, 1.6vw, 26px); font-weight: 800; letter-spacing: .06em; line-height: 1.15; overflow-wrap: anywhere; text-shadow: 0 2px 12px #000; }
+.memory-tunnel::after { content: 'EVENTSHARE · EXPO TECH'; position: absolute; top: 4cqh; left: 5cqw; color: rgb(184 239 255 / .82); font-family: var(--font-sans), sans-serif; font-size: clamp(10px, 1.35cqh, 15px); font-weight: 750; letter-spacing: .16em; pointer-events: none; }
+.memory-tunnel-pause { position: absolute; z-index: 2; left: max(24px, env(safe-area-inset-left)); bottom: max(24px, env(safe-area-inset-bottom)); min-height: 40px; padding: 8px 13px; border: 1px solid rgb(167 231 255 / .28); border-radius: 999px; background: rgb(3 16 32 / .62); color: #e9faff; font: inherit; font-size: 12px; opacity: .52; transition: opacity .2s, border-color .2s; }
+.memory-tunnel-pause:hover, .memory-tunnel-pause:focus-visible { opacity: 1; border-color: #6cddff; }

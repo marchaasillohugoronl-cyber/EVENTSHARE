@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { api, json, parse } from '@/server/http';
-import { uploadSchema, ALLOWED_IMAGE_TYPES, MAX_PHOTO_BYTES } from '@/server/validacion';
+import { mediaUploadSchema, ALLOWED_IMAGE_TYPES, ALLOWED_VIDEO_TYPES, MAX_PHOTO_BYTES, MAX_VIDEO_BYTES } from '@/server/validacion';
 import { requireAuth } from '@/server/autenticacion';
 import { assertActive, ensureMember, requireEvent } from '@/server/eventos';
 import { presignUpload, publicUrl } from '@/server/almacenamiento';
@@ -13,8 +13,8 @@ export const POST = api<{ id: string }>(async (req, { params }) => {
   const ev = await requireEvent(params.id);
   assertActive(ev);
   await ensureMember(ev.id, user.id);
-  const b = await parse(req, uploadSchema);
-  const key = `events/${ev.id}/${user.id}/${crypto.randomUUID()}.${ALLOWED_IMAGE_TYPES[b.contentType]}`;
+  const b = await parse(req, mediaUploadSchema);
+  const key = `events/${ev.id}/${user.id}/${crypto.randomUUID()}.${{ ...ALLOWED_IMAGE_TYPES, ...ALLOWED_VIDEO_TYPES }[b.contentType]}`;
   const upload = await presignUpload(key, b.contentType, b.size);
-  return json({ ...upload, key, publicUrl: publicUrl(key), maxBytes: MAX_PHOTO_BYTES });
+  return json({ ...upload, key, publicUrl: publicUrl(key), maxBytes: b.contentType.startsWith('video/') ? MAX_VIDEO_BYTES : MAX_PHOTO_BYTES });
 });

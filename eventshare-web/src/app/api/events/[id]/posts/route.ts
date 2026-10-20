@@ -4,7 +4,7 @@ import { queryOne } from '@/server/baseDatos';
 import { getAuth, requireAuth } from '@/server/autenticacion';
 import { assertActive, assertReadable, ensureMember, requireEvent } from '@/server/eventos';
 import { listPosts, toPost } from '@/server/publicaciones';
-import { publicUrl, verifyUploadedImage } from '@/server/almacenamiento';
+import { publicUrl, verifyUploadedMedia } from '@/server/almacenamiento';
 import { rateLimit } from '@/server/limiteSolicitudes';
 
 // GET /api/events/:id/posts?cursor=&limit=&photos=1  — muro (solo publicaciones APPROVED), orden descendente
@@ -30,7 +30,7 @@ export const POST = api<{ id: string }>(async (req, { params }) => {
 
   if (b.photoKey) {
     if (!b.photoKey.startsWith(`events/${ev.id}/${user.id}/`)) throw forbidden('Archivo no válido para este usuario');
-    await verifyUploadedImage(b.photoKey);
+    await verifyUploadedMedia(b.photoKey);
   }
   const status = ev.moderation_enabled ? 'PENDING' : 'APPROVED';
   let row;
