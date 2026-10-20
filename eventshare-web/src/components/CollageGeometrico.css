@@ -1,26 +1,119 @@
-/* ===== Collage geométrico ===== */
-.geometric-collage { display: block; width: 100%; height: auto; background: #061526; }
-.tv-slide > .geometric-collage { height: 100%; }
+/* ===== Collage geométrico: mosaico editorial sobre fondo blanco ===== */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@800&family=Poppins:wght@400;500;600;700&family=Permanent+Marker&display=swap');
 
-/* Entrada escalonada de cada pieza al recomponer el collage */
+.geometric-collage {
+  --paper: #fff;
+  --ink: #111;
+  --muted: #333;
+  --accent-red: #d62839;
+  --accent-blue: #1d4fb8;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-ui: 'Poppins', system-ui, sans-serif;
+  --font-hand: 'Permanent Marker', 'Comic Sans MS', cursive;
+
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-ui);
+}
+.geometric-collage--fill, .tv-slide > .geometric-collage { height: 100%; }
+/* Que las barras laterales de la TV sean blancas también */
+.tv-slide:has(> .geometric-collage) { background: #fff; }
+
+/* ---------- Piezas (fotos) ---------- */
+/* Las separaciones finas y blancas salen del layout; aquí damos profundidad suave. */
 .collage-tile {
   transform-box: fill-box;
   transform-origin: center;
   animation: collage-in 720ms cubic-bezier(.16, 1, .3, 1) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+.collage-tile image {
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / .18));
 }
 @keyframes collage-in {
   from { opacity: 0; transform: translateY(1.2%) scale(.975); }
   to   { opacity: 1; transform: scale(1); }
 }
 
-/* Interacción solo en piezas con enlace */
+/* ---------- Textos editoriales (unidades del viewBox, pensado para ~740 de ancho) ---------- */
+.collage-title {                 /* "Capture The Moment" */
+  font-family: var(--font-serif);
+  font-weight: 800;
+  font-size: 40px;
+  line-height: 1.05;
+  letter-spacing: -.01em;
+  fill: var(--ink);
+}
+.collage-subtitle {              /* "semuanya untuk keluarga" */
+  font-size: 12.5px;
+  font-weight: 400;
+  fill: var(--ink);
+}
+.collage-rule {                  /* raya corta bajo el subtítulo */
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+.collage-name {                  /* nombre en letra de marcador */
+  font-family: var(--font-hand);
+  font-size: 14.5px;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  fill: var(--ink);
+}
+.collage-slogan {                /* "GOOD DAY & GOOD PEOPLE" */
+  font-family: var(--font-hand);
+  font-size: 22px;
+  line-height: 1;
+  fill: var(--ink);
+}
+.collage-slogan.is-red, .collage-slogan .is-red,  .collage-accent-red  { fill: var(--accent-red);  font-size: 32px; }
+.collage-slogan.is-blue, .collage-slogan .is-blue, .collage-accent-blue { fill: var(--accent-blue); font-size: 29px; }
+.collage-badge {                 /* números sueltos: 10, 28, 24 */
+  font-size: 19px;
+  font-weight: 700;
+  fill: var(--ink);
+}
+.collage-label {                 /* "WIS - UDAH" */
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: .02em;
+  fill: var(--ink);
+}
+.collage-credit {                /* "Instastories by" */
+  font-size: 11.5px;
+  font-weight: 400;
+  fill: var(--ink);
+}
+.collage-credit.is-bold,
+.collage-credit strong,
+.collage-credit .is-bold { font-size: 14.5px; font-weight: 700; }
+.collage-caption {               /* párrafo de agradecimiento */
+  font-size: 11.5px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-anchor: middle;
+  fill: var(--muted);
+}
+.collage-hashtag {               /* "#ThePowerOfFamily" */
+  font-size: 17px;
+  font-weight: 700;
+  text-anchor: middle;
+  fill: var(--ink);
+}
+
+/* ---------- Interacción solo en piezas con enlace ---------- */
 .collage-tile--link a { cursor: pointer; outline: none; }
 .collage-tile--link image { transition: filter 220ms ease, opacity 220ms ease; }
 .collage-tile--link a:hover image,
-.collage-tile--link a:focus-visible image { filter: brightness(1.12) saturate(1.1); }
+.collage-tile--link a:focus-visible image {
+  filter: brightness(1.08) saturate(1.1) drop-shadow(0 2px 6px rgb(0 0 0 / .3));
+}
 
-.collage-focus-ring { pointer-events: none; stroke: transparent; stroke-width: 8; stroke-linejoin: round; }
-.collage-tile--link a:focus-visible .collage-focus-ring { stroke: #ffd166; }
+.collage-focus-ring { pointer-events: none; stroke: transparent; stroke-width: 6; stroke-linejoin: round; }
+.collage-tile--link a:focus-visible .collage-focus-ring { stroke: var(--accent-blue); }
 
 @media (prefers-reduced-motion: reduce) {
   .collage-tile { animation: none; }

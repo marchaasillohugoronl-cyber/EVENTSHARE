@@ -33,7 +33,7 @@ const VISTAS: { value: Vista; label: string }[] = [
 
 const VISTA_ALEATORIA: { value: SeleccionVista; label: string } = {
   value: 'random',
-  label: 'Cambiar diseño automáticamente (cada 4 s)',
+  label: 'Cambiar diseño automáticamente (cada 7 s)',
 };
 
 export default function PantallaTv({ event }: { event: PublicEvent }) {
@@ -41,7 +41,7 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
   const [posts, setPosts] = useState<Post[]>([]);
   const [index, setIndex] = useState(0);
   // Por defecto, la pantalla alterna sin repetir entre todos los diseños
-  // disponibles cada cuatro segundos.
+  // disponibles cada siete segundos.
   const [selectedView, setSelectedView] = useState<SeleccionVista>('random');
   const [view, setView] = useState<Vista>('trio');
   const [qr, setQr] = useState('');
@@ -97,7 +97,7 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
         return alternativas[Math.floor(Math.random() * alternativas.length)];
       });
     };
-    const timer = setInterval(cambiarVista, 4000);
+    const timer = setInterval(cambiarVista, 7000);
     return () => clearInterval(timer);
   }, [selectedView]);
 
@@ -150,10 +150,9 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
     <section className="tv-stage" aria-label="Recuerdos del evento">
       {renderContent()}
     </section>
-    {/* Nombre del evento arriba a la izquierda. Los diseños que ya muestran el
-        nombre en su título lo ocultan desde su CSS con:
-        .tv-screen:has(.mi-clase-stage) .tv-event-label { display: none; } */}
-    <h1 className="tv-event-label">{event.name}</h1>
+    <div className="tv-brand">
+      <img src="/senati-simbolo.png" alt="SENATI" width={1254} height={1254} />
+    </div>
     {!unavailable && <details className="tv-qr">
       <summary aria-label="Ampliar QR para participar">
         {qr && <img src={qr} alt="QR para entrar al evento" width={96} height={96} />}

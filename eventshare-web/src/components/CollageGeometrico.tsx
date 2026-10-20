@@ -1,170 +1,118 @@
 'use client';
 
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useId, useState, type CSSProperties } from 'react';
 
 type Photo = { url: string; label: string; href?: string };
-type Point = [number, number];
-
 type Props = {
   photos: Photo[];
   interactive?: boolean;
   fillFrame?: boolean;
-  /** Tiempo entre recomposiciones. 0 desactiva la rotación. */
+  /** Tiempo entre cambios de fotos. 0 desactiva la rotación. */
   intervalMs?: number;
 };
 
-const MAX_SEED = 2147483646;
-const nextSeed = () => Math.floor(Math.random() * MAX_SEED) + 1;
-const toPoints = (pts: Point[]) => pts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
+// Misma composición y separaciones que collage-demo.html (740 × 1290).
+const TILES = [
+  [308, 192, 175, 121], [490, 236, 88, 98], [176, 268, 123, 87],
+  [308, 322, 175, 196], [491, 344, 125, 146], [624, 426, 60, 93],
+  [81, 399, 76, 118], [164, 364, 135, 155], [70, 527, 175, 120],
+  [253, 527, 230, 253], [490, 499, 120, 195], [616, 527, 92, 134],
+  [35, 654, 112, 126], [154, 654, 92, 126], [491, 703, 175, 102],
+  [118, 788, 175, 110], [300, 788, 183, 140], [491, 815, 107, 114],
+  [175, 905, 118, 95], [301, 937, 132, 108], [440, 937, 84, 69],
+];
+const COLORS = [['#8aa39b', '#3f5a52'], ['#c9b58a', '#7b6a45'], ['#7f97ad', '#34495e'], ['#a7b27a', '#52602f']];
 
-function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const update = () => setReduced(mq.matches);
-    update();
-    mq.addEventListener('change', update);
-    return () => mq.removeEventListener('change', update);
-  }, []);
-  return reduced;
-}
-
-export default function CollageGeometrico({
-  photos,
-  interactive = false,
-  fillFrame = false,
-  intervalMs = 10000,
-}: Props) {
+export default function CollageGeometrico({ photos, interactive = false, fillFrame = false, intervalMs = 10000 }: Props) {
   const id = useId().replaceAll(':', '');
-  const [seed, setSeed] = useState(1); // valor fijo en SSR para evitar errores de hidratación
+  const [offset, setOffset] = useState(0);
   const [paused, setPaused] = useState(false);
-  const reducedMotion = usePrefersReducedMotion();
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const [failed, setFailed] = useState<Set<string>>(() => new Set());
+  const available = photos.filter(photo => !failed.has(photo.url));
 
-  // Primera composición aleatoria solo en cliente
-  useEffect(() => setSeed(nextSeed()), []);
-
-  // Rotación: se detiene con hover/foco, pestaña oculta o reduced-motion
   useEffect(() => {
-    if (!intervalMs || paused || reducedMotion) return;
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReducedMotion(query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
+
+  useEffect(() => {
+    if (intervalMs <= 0 || paused || reducedMotion || available.length < 2) return;
     const timer = setInterval(() => {
-      if (document.visibilityState === 'visible') setSeed(nextSeed());
+      if (document.visibilityState === 'visible') setOffset(value => value + 1);
     }, intervalMs);
     return () => clearInterval(timer);
-  }, [intervalMs, paused, reducedMotion]);
-
-  const tiles = useMemo(() => {
-    let state = seed;
-    const random = () => {
-      state = (state * 16807) % 2147483647;
-      return (state - 1) / MAX_SEED;
-    };
-
-    const cx = 440 + random() * 120;
-    const cy = 300 + random() * 100;
-    const rx = 170 + random() * 60;
-    const ry = 190 + random() * 50;
-
-    const outer: Point[] = [[cx, 0], [1000, 0], [1000, 700], [cx, 700], [0, 700], [0, 0]];
-    const inner: Point[] = Array.from({ length: 6 }, (_, i) => {
-      const angle = -Math.PI / 2 + (i * Math.PI) / 3;
-      return [cx + Math.cos(angle) * rx, cy + Math.sin(angle) * ry];
-    });
-
-    const polys: Point[][] = [];
-    for (let i = 0; i < 6; i++) {
-      const j = (i + 1) % 6;
-      if (random() > 0.3) polys.push([outer[i], outer[j], inner[i]], [outer[j], inner[j], inner[i]]);
-      else polys.push([outer[i], outer[j], inner[j], inner[i]]);
-    }
-    polys.push(inner);
-
-    // Fisher–Yates sobre una copia (no muta props)
-    const ordered = [...photos];
-    for (let i = ordered.length - 1; i > 0; i--) {
-      const j = Math.floor(random() * (i + 1));
-      [ordered[i], ordered[j]] = [ordered[j], ordered[i]];
-    }
-
-    return polys.map((points, i) => {
-      const xs = points.map(p => p[0]);
-      const ys = points.map(p => p[1]);
-      const x = Math.min(...xs);
-      const y = Math.min(...ys);
-      return {
-        key: `${seed}-${i}`,
-        clipId: `${id}-${seed}-${i}`,
-        polygon: toPoints(points),
-        box: { x, y, width: Math.max(...xs) - x, height: Math.max(...ys) - y },
-        photo: ordered.length ? ordered[i % ordered.length] : null,
-      };
-    });
-  }, [seed, photos, id]);
+  }, [intervalMs, paused, reducedMotion, available.length]);
 
   return (
     <svg
-      className="geometric-collage"
-      viewBox="0 0 1000 700"
-      preserveAspectRatio={fillFrame ? 'xMidYMid slice' : 'xMidYMid meet'}
+      className={`geometric-collage${fillFrame ? ' geometric-collage--fill' : ''}`}
+      viewBox="0 0 740 1290"
+      preserveAspectRatio="xMidYMid meet"
       role="group"
-      aria-label="Collage de fotos del evento"
-      onPointerEnter={() => setPaused(true)}
+      aria-label="Collage de recuerdos del evento"
+      onPointerEnter={() => { if (interactive) setPaused(true); }}
       onPointerLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
-      onBlur={() => setPaused(false)}
+      onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false); }}
     >
       <defs>
-        {tiles.map(t => (
-          <clipPath key={t.key} id={t.clipId}>
-            <polygon points={t.polygon} />
-          </clipPath>
+        {COLORS.map(([start, end], i) => (
+          <linearGradient key={i} id={`${id}-g${i}`} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor={start} /><stop offset="1" stopColor={end} />
+          </linearGradient>
         ))}
       </defs>
-
-      {tiles.map((t, i) => {
-        const { photo, box } = t;
+      {TILES.map(([x, y, width, height], i) => {
+        const photo = available.length ? available[(i + offset) % available.length] : undefined;
         const isLink = interactive && !!photo?.href;
-
-        const image = photo && (
-          <image
-            href={photo.url}
+        const box = { x, y, width, height };
+        const content = <>
+          <rect {...box} fill={`url(#${id}-g${i % COLORS.length})`} />
+          {photo && <image
             {...box}
+            href={photo.url}
             preserveAspectRatio="xMidYMid slice"
-            clipPath={`url(#${t.clipId})`}
-            onError={e => { e.currentTarget.style.display = 'none'; }}
-          />
-        );
-
+            onError={() => setFailed(previous => new Set(previous).add(photo.url))}
+          />}
+        </>;
         return (
-          <g
-            key={t.key}
-            className={`collage-tile${isLink ? ' collage-tile--link' : ''}`}
-            style={{ animationDelay: `${i * 60}ms` }}
-          >
-            <polygon points={t.polygon} fill="#18334a" />
-            {isLink ? (
-              <a href={photo!.href} aria-label={photo!.label}>
-                <title>{photo!.label}</title>
-                {image}
-                {/* Capa de foco visible con teclado */}
-                <polygon className="collage-focus-ring" points={t.polygon} fill="none" />
-              </a>
-            ) : (
-              <g>
-                {photo && <title>{photo.label}</title>}
-                {image}
-              </g>
-            )}
-            <polygon
-              points={t.polygon}
-              fill="none"
-              stroke="white"
-              strokeWidth={fillFrame ? 3 : 6}
-              strokeLinejoin="round"
-              pointerEvents="none"
-            />
+          <g key={`${i}-${photo?.url ?? 'empty'}`} className={`collage-tile${isLink ? ' collage-tile--link' : ''}`} style={{ '--i': i } as CSSProperties}>
+            {isLink ? <a href={photo!.href} aria-label={photo!.label}>
+              <title>{photo!.label}</title>
+              {content}
+              <rect {...box} className="collage-focus-ring" fill="none" />
+            </a> : <>{photo && <title>{photo.label}</title>}{content}</>}
           </g>
         );
       })}
+
+      <text className="collage-title" x="80" y="140">Capture</text>
+      <text className="collage-title" x="80" y="178">The Moment</text>
+      <text className="collage-subtitle" x="84" y="201">Momentos que nos unen</text>
+      <line className="collage-rule" x1="84" y1="218" x2="115" y2="218" />
+      <text className="collage-name" x="85" y="256">Recuerdos compartidos</text>
+
+      <text className="collage-slogan" x="592" y="278">GOOD</text>
+      <text className="collage-slogan is-red" x="642" y="274">DAY</text>
+      <text className="collage-slogan" x="592" y="304">GOOD</text>
+      <text className="collage-slogan" x="640" y="304">&amp;</text>
+      <text className="collage-slogan is-blue" x="619" y="327">PEOPLE</text>
+
+      <text className="collage-label" x="85" y="391">RECUERDOS</text>
+      <text className="collage-badge" x="624" y="416">01</text>
+      <text className="collage-badge" x="88" y="805">02</text>
+      <text className="collage-badge" x="602" y="831">03</text>
+      <text className="collage-credit" x="532" y="950">Creado juntos</text>
+      <text className="collage-credit is-bold" x="532" y="969">Nuestra comunidad</text>
+
+      <text className="collage-caption" x="370" y="1075">Cada foto cuenta una historia.</text>
+      <text className="collage-caption" x="370" y="1091">Gracias por compartir tus ideas, tu alegría y estos momentos.</text>
+      <text className="collage-caption" x="370" y="1107">Que sigamos creando recuerdos juntos.</text>
+      <text className="collage-hashtag" x="370" y="1144">#MomentosCompartidos</text>
     </svg>
   );
 }
