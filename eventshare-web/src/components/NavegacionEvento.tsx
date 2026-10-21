@@ -24,9 +24,7 @@ export default function EventNav({ code, canPost }: { code: string; canPost: boo
         )}
         {item(`/e/${code}/photos`, 'Álbum', path === `/e/${code}/photos`, Images)}
       </div>
-      <footer className="border-t border-current/10 px-4 py-2 text-center">
-        <Link href={`/crear?from=${code}`} className="text-xs font-medium underline underline-offset-4">Crear mis propios eventos ↗</Link>
-      </footer>
+
     </nav>
   );
 }

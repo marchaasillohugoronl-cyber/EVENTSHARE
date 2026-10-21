@@ -357,3 +357,33 @@ body {
 .robot-scene--compact .robot-controls { margin-top: -12px; }
 .robot-scene--compact .robot-controls button { pointer-events: auto; width: 32px; height: 32px; background: #08152ed9; }
 @media (max-height: 450px) { .tv-robot { width: 80px; } }
+
+/* Compartir: vista previa compacta y acción siempre al alcance. */
+.upload-flow { max-width: 36rem; margin-inline: auto; padding-bottom: 12rem; }
+.upload-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin-top: 1.5rem; }
+.upload-options .btn { min-height: 96px; flex-direction: column; gap: .65rem; }
+.upload-options .upload-gallery { grid-column: 1 / -1; min-height: 48px; flex-direction: row; }
+.upload-preview { margin-top: 1rem; padding: .65rem; border: 1px solid #dce5ef; border-radius: 20px; background: #fff; box-shadow: 0 10px 28px #132c4710; }
+.upload-preview-heading { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: 0 .25rem .5rem; font-size: .85rem; color: #36506a; }
+.upload-preview-heading span { display: flex; align-items: center; gap: .4rem; }
+.upload-preview-heading button { min-height: 44px; padding-inline: .5rem; text-decoration: underline; }
+.upload-preview > :is(img, video) { display: block; width: 100%; max-height: min(44dvh, 420px); object-fit: contain; border-radius: 12px; background: #eef3f8; }
+.upload-checking { display: grid; place-items: center; min-height: 180px; margin-top: 1rem; border-radius: 16px; background: #eef3f8; color: #36506a; }
+.upload-publish-bar { position: fixed; z-index: 39; bottom: calc(73px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: min(100%, 36rem); padding: .85rem 1.25rem; background: #fffffff5; color: #253b50; border-top: 1px solid #dce5ef; box-shadow: 0 -8px 28px #132c4710; backdrop-filter: blur(12px); }
+.upload-publish-bar > .btn { min-height: 52px; gap: .6rem; }
+.upload-progress { display: block; width: 100%; height: 6px; accent-color: rgb(var(--brand-rgb)); }
+.wedding-event .upload-preview, .wedding-event .upload-publish-bar { background: #171918; color: #f6f0e3; border-color: #38362d; }
+.wedding-event .upload-preview-heading { color: #f6f0e3; }
+.recording-dialog { width: min(100%, 36rem); max-height: 94dvh; padding: 1rem; border: 1px solid #ffffff30; border-radius: 20px; background: #101923; color: white; overflow-y: auto; }
+.recording-dialog::backdrop { background: #000b; backdrop-filter: blur(5px); }
+.recording-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .75rem; }
+.recording-header h2 { font-size: 1.1rem; font-weight: 700; }
+.recording-header button { color: white; }
+.recording-preview { width: 100%; height: 48dvh; object-fit: contain; border-radius: 12px; background: #000; }
+.recording-footer { display: grid; gap: .75rem; margin-top: 1rem; text-align: center; }
+.recording-footer progress { width: 100%; height: 6px; accent-color: #ff5252; }
+.recording-timer { font-size: 1.35rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: no-preference) {
+  .upload-preview { animation: upload-preview-in 220ms ease-out; }
+}
+@keyframes upload-preview-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }

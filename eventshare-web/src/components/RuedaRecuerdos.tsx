@@ -8,7 +8,7 @@ const SEGMENT_COUNT = 8;
 const GAP = 0.03;
 const STEPS = 16;
 const OUTER = 49; // % del tamaño de la rueda
-const INNER = 30; // si lo cambias, cambia también inset: 20% de .memory-wheel::before
+const INNER = 23; // Radio interior del anillo de fotografías.
 
 const WHEEL_SWAP_MS = 5000; // cada cuánto cambia UNA foto de la rueda
 const PHOTO_MS = 9000; // duración de cada foto protagonista
@@ -146,7 +146,6 @@ export default function RuedaRecuerdos({ posts, name, labels = DEFAULT_LABELS }:
       {/* Izquierda: la rueda */}
       <div className="memory-wheel-side">
         <div className="memory-wheel" role="group" aria-label={`Rueda de recuerdos de ${name}`}>
-          <div className="memory-wheel-backdrop" aria-hidden="true" />
           <div className={`memory-wheel-ring ${paused ? 'is-paused' : ''}`}>
             {segments.map(({ style, tag }, i) => {
               const slot = wheel.slots[i];
@@ -186,11 +185,6 @@ export default function RuedaRecuerdos({ posts, name, labels = DEFAULT_LABELS }:
           </div>
         </div>
 
-        <div className="memory-wheel-center">
-          <span>EVENTSHARE</span>
-          <i className="memory-wheel-rule" />
-          <h2>{name}</h2>
-        </div>
       </div>
 
       {/* Derecha: foto o video protagonista */}

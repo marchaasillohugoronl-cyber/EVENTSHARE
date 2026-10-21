@@ -36,19 +36,6 @@
   container-type: size;
 }
 
-/* Anillo de luz y cristal oscuro en el hueco (INNER = 30 → inset 20%) */
-.memory-wheel::before {
-  content: '';
-  position: absolute;
-  inset: 20%;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgb(0 0 0 / .5), rgb(0 0 0 / .82));
-  border: 1px solid rgb(255 255 255 / .28);
-  box-shadow:
-    0 0 5cqw rgb(var(--brand-rgb) / .55),
-    inset 0 0 5cqw rgb(var(--brand-rgb) / .35);
-}
-
 .memory-wheel-ring {
   position: absolute;
   inset: 0;
@@ -260,27 +247,6 @@
   inset: 0;
   background: radial-gradient(ellipse at 65% 45%, transparent 30%, rgb(0 0 0 / .4));
   pointer-events: none;
-}
-
-.memory-wheel-backdrop {
-  position: absolute;
-  inset: 20%;
-  overflow: hidden;
-  border-radius: 50%;
-  border: 1px solid #83d8ff65;
-  box-shadow: 0 0 25px #008dff35;
-}
-.memory-wheel-backdrop::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 70% 35%, #16344c, #060e1b 75%);
-}
-.memory-wheel-backdrop::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, #03244e45 10%, #03244e85 45%, #02172dd9 100%);
 }
 
 @container (max-aspect-ratio: 1 / 1) {
