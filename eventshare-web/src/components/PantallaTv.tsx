@@ -51,6 +51,7 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
   const [unavailable, setUnavailable] = useState(false);
   const [loading, setLoading] = useState(true);
   const [fullscreenError, setFullscreenError] = useState('');
+  const [controlsOpen, setControlsOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -168,9 +169,16 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
         <p>Escanea y comparte</p><span>{event.code}</span>
       </div>
     </details>}
-    <details className="tv-controls">
-      <summary aria-label="Opciones de pantalla">•••</summary>
-      <div className="tv-controls-panel">
+    <div className="tv-controls">
+      <button
+        type="button"
+        className="tv-controls-toggle"
+        aria-label="Opciones de pantalla"
+        aria-expanded={controlsOpen}
+        aria-controls="tv-controls-panel"
+        onClick={() => setControlsOpen(open => !open)}
+      >•••</button>
+      {controlsOpen && <div id="tv-controls-panel" className="tv-controls-panel">
         <label className="text-sm">Diseño de pantalla
           {/* El selector se llena solo desde la lista VISTAS (PASO 3). */}
           <select
@@ -184,8 +192,8 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
         </label>
         <button className="tv-fullscreen" onClick={fullscreen}>Activar / salir de pantalla completa</button>
         {fullscreenError && <p role="status" className="text-sm">{fullscreenError}</p>}
-      </div>
-    </details>
+      </div>}
+    </div>
     {notice && <p role="status" className="tv-notice">{notice}</p>}
   </main>;
 }

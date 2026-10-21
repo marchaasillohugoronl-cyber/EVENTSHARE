@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useState, type CSSProperties } from 'react';
+import { useEffect, useId, useRef, useState, type CSSProperties } from 'react';
 
 type Photo = { url: string; label: string; href?: string };
 type Props = {
@@ -25,6 +25,20 @@ const COLORS = [['#8aa39b', '#3f5a52'], ['#c9b58a', '#7b6a45'], ['#7f97ad', '#34
 
 export default function CollageGeometrico({ photos, interactive = false, fillFrame = false, intervalMs = 10000 }: Props) {
   const id = useId().replaceAll(':', '');
+  const svgRef = useRef<SVGSVGElement>(null);
+  const [landscape, setLandscape] = useState(false);
+  const spread = landscape ? 2.6 : 1;
+
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const observer = new ResizeObserver(([entry]) => {
+      const { width, height } = entry.contentRect;
+      setLandscape(width / height >= 1.2);
+    });
+    observer.observe(svg);
+    return () => observer.disconnect();
+  }, []);
   const [offset, setOffset] = useState(0);
   const [paused, setPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -49,8 +63,9 @@ export default function CollageGeometrico({ photos, interactive = false, fillFra
 
   return (
     <svg
-      className={`geometric-collage${fillFrame ? ' geometric-collage--fill' : ''}`}
-      viewBox="0 0 740 1290"
+      ref={svgRef}
+      className={`geometric-collage${landscape ? ' geometric-collage--landscape' : ''}${fillFrame ? ' geometric-collage--fill' : ''}`}
+      viewBox={landscape ? '0 40 1924 1180' : '0 80 740 1090'}
       preserveAspectRatio="xMidYMid meet"
       role="group"
       aria-label="Collage de recuerdos del evento"
@@ -69,7 +84,7 @@ export default function CollageGeometrico({ photos, interactive = false, fillFra
       {TILES.map(([x, y, width, height], i) => {
         const photo = available.length ? available[(i + offset) % available.length] : undefined;
         const isLink = interactive && !!photo?.href;
-        const box = { x, y, width, height };
+        const box = { x: x * spread, y, width: width * spread, height };
         const content = <>
           <rect {...box} fill={`url(#${id}-g${i % COLORS.length})`} />
           {photo && <image
@@ -80,7 +95,16 @@ export default function CollageGeometrico({ photos, interactive = false, fillFra
           />}
         </>;
         return (
-          <g key={`${i}-${photo?.url ?? 'empty'}`} className={`collage-tile${isLink ? ' collage-tile--link' : ''}`} style={{ '--i': i } as CSSProperties}>
+          <g
+            key={`${i}-${offset}-${photo?.url ?? 'empty'}`}
+            className={`collage-tile${isLink ? ' collage-tile--link' : ''}`}
+            style={{
+              '--i': i,
+              '--enter-x': `${(x + width / 2 - 370) * .55}px`,
+              '--enter-y': `${(y + height / 2 - 620) * .4}px`,
+              '--enter-rotation': `${i % 2 === 0 ? -9 : 9}deg`,
+            } as CSSProperties}
+          >
             {isLink ? <a href={photo!.href} aria-label={photo!.label}>
               <title>{photo!.label}</title>
               {content}
@@ -90,29 +114,6 @@ export default function CollageGeometrico({ photos, interactive = false, fillFra
         );
       })}
 
-      <text className="collage-title" x="80" y="140">Capture</text>
-      <text className="collage-title" x="80" y="178">The Moment</text>
-      <text className="collage-subtitle" x="84" y="201">Momentos que nos unen</text>
-      <line className="collage-rule" x1="84" y1="218" x2="115" y2="218" />
-      <text className="collage-name" x="85" y="256">Recuerdos compartidos</text>
-
-      <text className="collage-slogan" x="592" y="278">GOOD</text>
-      <text className="collage-slogan is-red" x="642" y="274">DAY</text>
-      <text className="collage-slogan" x="592" y="304">GOOD</text>
-      <text className="collage-slogan" x="640" y="304">&amp;</text>
-      <text className="collage-slogan is-blue" x="619" y="327">PEOPLE</text>
-
-      <text className="collage-label" x="85" y="391">RECUERDOS</text>
-      <text className="collage-badge" x="624" y="416">01</text>
-      <text className="collage-badge" x="88" y="805">02</text>
-      <text className="collage-badge" x="602" y="831">03</text>
-      <text className="collage-credit" x="532" y="950">Creado juntos</text>
-      <text className="collage-credit is-bold" x="532" y="969">Nuestra comunidad</text>
-
-      <text className="collage-caption" x="370" y="1075">Cada foto cuenta una historia.</text>
-      <text className="collage-caption" x="370" y="1091">Gracias por compartir tus ideas, tu alegría y estos momentos.</text>
-      <text className="collage-caption" x="370" y="1107">Que sigamos creando recuerdos juntos.</text>
-      <text className="collage-hashtag" x="370" y="1144">#MomentosCompartidos</text>
     </svg>
   );
 }

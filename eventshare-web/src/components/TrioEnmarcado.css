@@ -16,8 +16,19 @@
   overflow: hidden;
   container-type: size;
   isolation: isolate;
-  background: #090b0e url('/fondo-hexagonal-hd.webp') center / cover no-repeat;
+  background: #090b0e;
   color: var(--ink);
+}
+
+/* Suaviza la imagen de baja resolución sin afectar las fotos ni los marcos. */
+.trio-stage::before {
+  content: '';
+  position: absolute;
+  inset: -12px;
+  z-index: 0;
+  background: url('/1437058271_153774_1437060693_noticia_normal.jpg') center / cover no-repeat;
+  filter: blur(3px);
+  pointer-events: none;
 }
 
 /* Viñeta: oscurece arriba y abajo para que el texto se lea */

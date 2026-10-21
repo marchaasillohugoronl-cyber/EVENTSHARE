@@ -8,11 +8,11 @@ import type { Post } from '@/lib/tipos';
 
 const PIECES = 8;
 // A single wedge is rotated eight times. The stationary mask exposes only
-// the right half of the rotating ring, as in the reference video.
+// the upper half of the rotating ring, centered at the bottom of the screen.
 const wedge = Array.from({ length: 2 }, (_, edge) =>
   Array.from({ length: 25 }, (_, i) => {
     const angle = (-22 + (edge ? 24 - i : i) * 44 / 24) * Math.PI / 180;
-    const radius = edge ? 29 : 49;
+    const radius = edge ? 23 : 49;
     return `${50 + radius * Math.cos(angle)}% ${50 + radius * Math.sin(angle)}%`;
   }).join(',')
 ).join(',');
@@ -23,8 +23,10 @@ export default function SemicirculoSenati({ posts, name }: { posts: Post[]; name
   const [reduced, setReduced] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [offset, setOffset] = useState(0);
+  const [backgroundIndex, setBackgroundIndex] = useState(0);
   const [failed, setFailed] = useState<string[]>([]);
   const media = useMemo(() => posts.filter(p => p.photoUrl && !failed.includes(p.id)), [posts, failed]);
+  const backgroundPhotos = useMemo(() => media.filter(p => !esVideo(p.photoUrl!)), [media]);
   const stopped = paused || reduced || hidden;
 
   useEffect(() => {
@@ -51,7 +53,29 @@ export default function SemicirculoSenati({ posts, name }: { posts: Post[]; name
   }, [stopped, media.length]);
 
   const fail = (id: string) => setFailed(items => items.includes(id) ? items : [...items, id]);
+  useEffect(() => {
+    if (stopped || backgroundPhotos.length < 2) return;
+    const timer = setInterval(() => setBackgroundIndex(value => value + 1), 6500);
+    return () => clearInterval(timer);
+  }, [stopped, backgroundPhotos.length]);
+
+  const currentBackground = backgroundPhotos[backgroundIndex % backgroundPhotos.length];
+  const previousBackground = backgroundIndex > 0
+    ? backgroundPhotos[(backgroundIndex - 1) % backgroundPhotos.length]
+    : undefined;
+
   return <div ref={stage} className={`senati-semicircle${stopped ? ' is-stopped' : ''}`}>
+    <div className="semicircle-background" aria-hidden="true">
+      {previousBackground && <img src={previousBackground.photoUrl!} alt="" onError={() => fail(previousBackground.id)} />}
+      {currentBackground && <img
+        key={`${backgroundIndex}-${currentBackground.id}`}
+        className="semicircle-background-current"
+        src={currentBackground.photoUrl!}
+        alt=""
+        decoding="async"
+        onError={() => fail(currentBackground.id)}
+      />}
+    </div>
     <div className="semicircle-composition">
       <div className="semicircle-mask" role="group" aria-label={`Semicírculo de recuerdos de ${name}`}>
         <div className="semicircle-ring">

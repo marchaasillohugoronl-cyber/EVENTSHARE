@@ -160,14 +160,14 @@ body {
 
 .tv-qr { position: absolute; z-index: 10; right: max(18px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom)); }
 .tv-qr summary { list-style: none; cursor: pointer; background: white; padding: 5px; border-radius: 10px; color: #172033; box-shadow: 0 4px 20px #0005; }
-.tv-qr summary::-webkit-details-marker, .tv-controls summary::-webkit-details-marker { display: none; }
+.tv-qr summary::-webkit-details-marker { display: none; }
 .tv-qr summary img { width: clamp(76px, 7vw, 112px); height: auto; border-radius: 5px; }
 .tv-qr summary span { display: block; text-align: center; font-size: 10px; padding-bottom: 3px; }
 .tv-qr-expanded { position: absolute; right: 0; bottom: calc(100% + 12px); width: min(280px, 80vw); padding: 12px; border-radius: 14px; background: white; color: #172033; text-align: center; box-shadow: 0 8px 30px #0006; }
 .tv-qr-expanded img { width: 100%; height: auto; }
 .tv-qr-expanded span { font-size: 12px; letter-spacing: .15em; }
 .tv-controls { position: absolute; z-index: 20; top: 18px; right: 18px; }
-.tv-controls summary { list-style: none; cursor: pointer; display: grid; place-items: center; width: 44px; height: 36px; border: 1px solid #ffffff30; border-radius: 999px; background: #0006; color: white; letter-spacing: 3px; }
+.tv-controls-toggle { list-style: none; cursor: pointer; display: grid; place-items: center; width: 44px; height: 36px; border: 1px solid #ffffff30; border-radius: 999px; background: #0006; color: white; letter-spacing: 3px; }
 .tv-controls-panel { position: absolute; top: 46px; right: 0; width: min(300px, 90vw); padding: 18px; display: grid; gap: 16px; background: #101a2aee; border: 1px solid #ffffff20; border-radius: 16px; box-shadow: 0 12px 40px #0008; backdrop-filter: blur(16px); }
 .tv-notice { position: absolute; z-index: 5; left: 50%; bottom: 24px; transform: translateX(-50%); max-width: 60%; background: #000a; border-radius: 8px; padding: 8px 12px; font-size: 12px; color: #fde68a; }
 /* SENATI: shared identity and cinematic vector character. */

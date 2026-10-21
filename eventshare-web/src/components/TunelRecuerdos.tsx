@@ -75,16 +75,20 @@ export default function TunelRecuerdos({ posts, name }: { posts: Post[]; name: s
         rotation = (rotation + delta * .000018) % (Math.PI * 2);
       }
       const available = assets.filter(asset => asset instanceof HTMLVideoElement ? asset.readyState >= 2 : asset.complete && asset.naturalWidth > 0);
-      ctx.fillStyle = '#030b16'; ctx.fillRect(0, 0, width, height);
+      ctx.fillStyle = '#000'; ctx.fillRect(0, 0, width, height);
       if (!available.length) return;
       const cx = width * .5, cy = height * .68;
       const projection = Math.max(width * .6, height) * 730;
-      const spacing = 360, rows = 20, columns = 12;
+      const spacing = 360, rows = 44, columns = 12;
       const shift = travel % spacing, cycle = Math.floor(travel / spacing);
+      // Prolonga las paredes hasta el punto de fuga.
+      const depthAt = (row: number) => 480 + spacing * (
+        row <= 20 ? row : 20 + (Math.pow(1.25, row - 20) - 1) / .25
+      ) - shift;
       const point = (angle: number, depth: number): Point => [cx + Math.cos(angle) * projection / depth, cy + Math.sin(angle) * projection / depth];
       // Dibuja desde el fondo; las filas cercanas cubren sus bordes sin huecos.
       for (let row = rows - 1; row >= 0; row--) {
-        const near = 480 + row * spacing - shift, far = near + spacing - 9;
+        const near = depthAt(row), far = depthAt(row + 1) - 9;
         for (let col = 0; col < columns; col++) {
           const angle = col * Math.PI * 2 / columns - Math.PI / 2 + rotation;
           const end = angle + Math.PI * 2 / columns - .009;
@@ -95,13 +99,20 @@ export default function TunelRecuerdos({ posts, name }: { posts: Post[]; name: s
           texture(ctx, asset, corners);
           ctx.beginPath(); corners.forEach((p, i) => i ? ctx.lineTo(...p) : ctx.moveTo(...p)); ctx.closePath();
           ctx.strokeStyle = 'rgba(117, 224, 255, .82)'; ctx.lineWidth = Math.max(.45, Math.min(2.4, 1500 / near)); ctx.stroke();
-          ctx.fillStyle = `rgba(0,0,0,${Math.max(0, (far - 1900) / 6500)})`; ctx.fill();
+          const depthShade = .88 * (1 - Math.exp(-Math.max(0, far - 1900) / 6500));
+          ctx.fillStyle = `rgba(0,0,0,${depthShade})`; ctx.fill();
         }
       }
-      const radius = projection / (480 + rows * spacing - shift);
-      const shade = ctx.createRadialGradient(cx, cy, radius * .65, cx, cy, radius * 1.4);
-      shade.addColorStop(0, '#020914'); shade.addColorStop(.6, '#020914e8'); shade.addColorStop(1, '#02091400');
-      ctx.fillStyle = shade; ctx.beginPath(); ctx.arc(cx, cy, radius * 1.4, 0, Math.PI * 2); ctx.fill();
+      // Oculta las miniaturas lejanas con una transición negra sin bordes duros.
+      const shadowRadius = projection / 4200;
+      const centerShadow = ctx.createRadialGradient(cx, cy, 0, cx, cy, shadowRadius);
+      centerShadow.addColorStop(0, '#000');
+      centerShadow.addColorStop(.38, '#000');
+      centerShadow.addColorStop(.58, 'rgba(0, 0, 0, .94)');
+      centerShadow.addColorStop(.8, 'rgba(0, 0, 0, .5)');
+      centerShadow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = centerShadow;
+      ctx.fillRect(cx - shadowRadius, cy - shadowRadius, shadowRadius * 2, shadowRadius * 2);
     };
     frame = requestAnimationFrame(render);
     return () => {
@@ -112,7 +123,6 @@ export default function TunelRecuerdos({ posts, name }: { posts: Post[]; name: s
 
   return <div className="memory-tunnel" aria-label="Túnel continuo de fotos y videos">
     <canvas ref={canvas} className="memory-tunnel-canvas" aria-label={`Recuerdos de ${name}`} />
-    <div className="memory-tunnel-title"><h2>{name}</h2></div>
     <button className="memory-tunnel-pause" aria-pressed={paused} onClick={() => setPaused(value => !value)}>{paused ? 'Reanudar túnel' : 'Pausar túnel'}</button>
   </div>;
 }

@@ -1,4 +1,4 @@
-.memory-tunnel { position: relative; height: 100%; overflow: hidden; background: #030b16; }
+.memory-tunnel { position: relative; height: 100%; overflow: hidden; background: #000; }
 .memory-tunnel-canvas { display: block; width: 100%; height: 100%; }
 .memory-tunnel-title { position: absolute; left: 50%; top: 68%; transform: translate(-50%, -50%); width: 14%; text-align: center; pointer-events: none; }
 .memory-tunnel-title h2 { font-family: var(--font-sans), sans-serif; font-size: clamp(12px, 1.6vw, 26px); font-weight: 800; letter-spacing: .06em; line-height: 1.15; overflow-wrap: anywhere; text-shadow: 0 2px 12px #000; }

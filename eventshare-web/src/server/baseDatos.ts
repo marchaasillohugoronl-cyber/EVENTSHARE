@@ -13,9 +13,30 @@ function pool(): Pool {
   return globalThis.__pgPool;
 }
 
+function isConnectionFailure(error: unknown): boolean {
+  if (error instanceof AggregateError) {
+    return error.errors.length > 0 && error.errors.every(isConnectionFailure);
+  }
+  const code = (error as { code?: string } | null)?.code;
+  return !!code && ['ECONNREFUSED', 'ECONNRESET', 'ETIMEDOUT', 'EAI_AGAIN', 'ENOTFOUND', 'ENETUNREACH', 'EHOSTUNREACH', '57P03'].includes(code);
+}
+
 export async function query<T extends QueryResultRow = any>(text: string, params: unknown[] = []): Promise<T[]> {
-  const res = await pool().query<T>(text, params);
-  return res.rows;
+  // Solo las lecturas se reintentan: repetir una escritura podría duplicar datos.
+  const attempts = /^\s*SELECT\b/i.test(text) ? 2 : 1;
+  for (let attempt = 0; attempt < attempts; attempt++) {
+    try {
+      const res = await pool().query<T>(text, params);
+      return res.rows;
+    } catch (error) {
+      if (!isConnectionFailure(error)) throw error;
+      if (attempt + 1 === attempts) {
+        throw new Error('No se pudo conectar con la base de datos. Inténtalo de nuevo en unos segundos.', { cause: error });
+      }
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+  }
+  throw new Error('No se pudo completar la consulta.');
 }
 
 export async function queryOne<T extends QueryResultRow = any>(text: string, params: unknown[] = []): Promise<T | null> {
