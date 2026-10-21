@@ -20,14 +20,13 @@
   color: var(--ink);
 }
 
-/* Suaviza la imagen de baja resolución sin afectar las fotos ni los marcos. */
+/* Fondo restaurado en mayor resolución. */
 .trio-stage::before {
   content: '';
   position: absolute;
-  inset: -12px;
+  inset: 0;
   z-index: 0;
-  background: url('/1437058271_153774_1437060693_noticia_normal.jpg') center / cover no-repeat;
-  filter: blur(3px);
+  background: url('/images/fondo-trio-atardecer-hd.webp') center / cover no-repeat;
   pointer-events: none;
 }
 

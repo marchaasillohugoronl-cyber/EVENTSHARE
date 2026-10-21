@@ -13,10 +13,7 @@
   isolation: isolate;
   overflow: hidden;
   container-type: size;
-  /* Oscurece y desenfoca el fondo del evento para que las fotos destaquen */
-  background: #031831;
-  -webkit-backdrop-filter: blur(14px) brightness(.7);
-  backdrop-filter: blur(14px) brightness(.7);
+  background: #060d18;
 }
 
 /* El nombre ya aparece en el centro de la rueda */
@@ -79,7 +76,9 @@
   position: absolute;
   z-index: 2;
   padding: .55cqw 1.3cqw;
-  background: rgb(var(--brand-rgb, 0 0 0));
+  background: rgb(6 18 32 / .88);
+  border: 1px solid rgb(170 222 255 / .45);
+  border-radius: 999px;
   color: rgb(var(--on-brand-rgb, 255 255 255));
   font-family: var(--font-sans), sans-serif;
   font-size: clamp(9px, 1.1cqw, 20px);
@@ -115,14 +114,15 @@
 }
 .memory-wheel-rule { display: block; width: 9cqh; height: 1px; background: rgb(255 255 255 / .55); }
 .memory-wheel-center h2 {
-  font-family: var(--font-serif), serif;
+  font-family: var(--font-sans), sans-serif;
+  font-weight: 900;
   font-size: clamp(20px, 5.2cqh, 72px);
   line-height: 1.12;
   max-height: 40cqh;
   overflow: hidden;
   overflow-wrap: anywhere;
   text-transform: uppercase;
-  letter-spacing: .08em;
+  letter-spacing: -.025em;
   text-shadow: 0 2px 14px rgb(0 0 0 / .7);
 }
 
@@ -134,7 +134,7 @@
   display: grid;
   place-items: center;
   margin-left: -7cqh;
-  padding: 8cqh 4cqw 8cqh 7cqh;
+  padding: 9cqh 6cqw 9cqh 7cqh;
   overflow: visible;
   isolation: isolate;
 }
@@ -162,14 +162,13 @@
   max-width: 100%;
   max-height: 100%;
   overflow: hidden;
-  border-radius: 2cqh;
-  background: transparent;
-  box-shadow: 0 2cqh 8cqh #00132b55, 0 0 4cqh #28bbff12;
-  mask-image: linear-gradient(90deg, transparent, #000 3%, #000 98%, transparent);
+  border-radius: 2.4cqh;
+  border: 1px solid rgb(215 237 255 / .5);
+  background: #080f1b;
+  box-shadow: 0 3cqh 8cqh rgb(0 0 0 / .55), 0 0 0 .7cqh rgb(255 255 255 / .04);
   animation: memory-wheel-single-in 1100ms cubic-bezier(.16, 1, .3, 1) both;
 }
 .memory-wheel-single figure.memory-wheel-outgoing { z-index: 1; animation: memory-wheel-single-out 900ms ease-out both; pointer-events: none; }
-.memory-wheel-single figure:not(.memory-wheel-outgoing) > img { animation: memory-wheel-photo-drift 9s ease-out both; }
 .memory-wheel-single figure img,
 .memory-wheel-single figure video {
   display: block;
@@ -177,20 +176,23 @@
   height: auto;
   min-height: 0;
   max-width: 100%;
-  max-height: 84cqh;
+  max-height: 82cqh;
   object-fit: contain;
 }
 .memory-wheel-single figcaption {
   position: absolute;
-  left: 0;
-  bottom: .6cqh;
-  padding: 1cqh 2.4cqh;
-  background: rgb(var(--brand-rgb, 0 0 0));
+  left: 1.8cqh;
+  bottom: 2cqh;
+  max-width: calc(100% - 3.6cqh);
+  overflow-wrap: anywhere;
+  padding: 1cqh 2cqh;
+  background: rgb(6 18 32 / .88);
+  border: 1px solid rgb(255 255 255 / .25);
   color: rgb(var(--on-brand-rgb, 255 255 255));
-  border-radius: 0 12px 12px 0;
+  border-radius: 12px;
   font-family: var(--font-sans), sans-serif;
   font-size: clamp(11px, 1.8cqh, 22px);
-  letter-spacing: .18em;
+  letter-spacing: .08em;
   text-transform: uppercase;
 }
 .memory-wheel-progress {
@@ -198,8 +200,8 @@
   left: 0;
   bottom: 0;
   width: 100%;
-  height: .6cqh;
-  background: rgb(255 255 255 / .85);
+  height: .35cqh;
+  background: linear-gradient(90deg, #7dd3fc, #fff);
   transform-origin: left;
   animation: memory-wheel-progress linear both;
 }
@@ -242,14 +244,13 @@
 @keyframes memory-wheel-ambient-in { from { opacity: 0; } to { opacity: .3; } }
 @keyframes memory-wheel-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 
-/* Fondo de IA conservado en la pantalla y dentro del círculo. */
+/* Fondo de mayor resolución, sin mosaicos ni desenfoque. */
 .memory-wheel-stage::before {
   content: '';
   position: absolute;
   z-index: -1;
-  inset: -6px;
-  background: linear-gradient(90deg, #052c5a85, #03152f55 55%, #03152f75), url('/images/fondo-ia-senati.webp') center / cover no-repeat;
-  filter: blur(1.5px);
+  inset: 0;
+  background: linear-gradient(90deg, rgb(3 10 20 / .88), rgb(3 10 20 / .5) 55%, rgb(3 10 20 / .75)), url('/images/fondo-muro-tecnologia-hd.webp') center / cover no-repeat;
   pointer-events: none;
 }
 .memory-wheel-stage::after {
@@ -257,9 +258,7 @@
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: url('/images/circuitos-senati.svg') center / 420px 300px repeat;
-  opacity: .3;
-  mask-image: linear-gradient(90deg, #000, #0009 55%, #000);
+  background: radial-gradient(ellipse at 65% 45%, transparent 30%, rgb(0 0 0 / .4));
   pointer-events: none;
 }
 
@@ -274,13 +273,29 @@
 .memory-wheel-backdrop::before {
   content: '';
   position: absolute;
-  inset: -3px;
-  background: url('/images/circuitos-senati.svg') center / 290px 210px repeat, url('/images/fondo-ia-senati.webp') center / cover no-repeat;
-  filter: blur(.6px);
+  inset: 0;
+  background: radial-gradient(circle at 70% 35%, #16344c, #060e1b 75%);
 }
 .memory-wheel-backdrop::after {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, #03244e45 10%, #03244e85 45%, #02172dd9 100%);
+}
+
+@container (max-aspect-ratio: 1 / 1) {
+  .memory-wheel-side { flex-basis: 36cqw; }
+  .memory-wheel { width: 80cqw; height: 80cqw; left: -40cqw; top: calc(50% - 40cqw); }
+  .memory-wheel-center { left: 12cqw; width: 22cqw; gap: 2cqw; }
+  .memory-wheel-center h2 { font-size: clamp(16px, 4.4cqw, 40px); }
+  .memory-wheel-center span { font-size: clamp(7px, 1.5cqw, 12px); letter-spacing: .15em; }
+  .memory-wheel-single { margin-left: 0; padding: 8cqh 4cqw 8cqh 2cqw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memory-wheel-ring,
+  .memory-wheel-segment :is(img, video),
+  .memory-wheel-single figure,
+  .memory-wheel-progress { animation: none; }
+  .memory-wheel-single figure.memory-wheel-outgoing { display: none; }
 }

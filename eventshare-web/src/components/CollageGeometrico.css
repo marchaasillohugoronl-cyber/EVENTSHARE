@@ -25,7 +25,7 @@
   width: 100%;
   height: auto;
   aspect-ratio: var(--collage-ratio);
-  background: var(--paper);
+  background: transparent;
   color: var(--ink);
   font-family: var(--f-ui);
   font-synthesis: none;
@@ -45,8 +45,17 @@
   box-sizing: border-box;
   padding: clamp(8px, 1.5vmin, 32px);
   overflow: hidden;
-  background: var(--paper, #fff);
 }
+
+.geometric-collage,
+.tv-slide:has(> .geometric-collage) {
+  background:
+    linear-gradient(180deg, rgb(5 15 24 / .12), rgb(5 15 24 / .35)),
+    #243b50 url('/images/fondo-collage-condor.webp') center / cover no-repeat;
+}
+
+/* Un solo fondo continuo, incluyendo los márgenes de la pantalla. */
+.tv-slide > .geometric-collage { background: transparent; }
 
 .tv-slide > .geometric-collage,
 .geometric-collage--fill {

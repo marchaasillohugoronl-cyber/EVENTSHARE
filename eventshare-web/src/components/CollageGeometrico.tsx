@@ -65,7 +65,7 @@ export default function CollageGeometrico({ photos, interactive = false, fillFra
     <svg
       ref={svgRef}
       className={`geometric-collage${landscape ? ' geometric-collage--landscape' : ''}${fillFrame ? ' geometric-collage--fill' : ''}`}
-      viewBox={landscape ? '0 40 1924 1180' : '0 80 740 1090'}
+      viewBox={landscape ? '0 108 1924 1020' : '0 140 740 960'}
       preserveAspectRatio="xMidYMid meet"
       role="group"
       aria-label="Collage de recuerdos del evento"

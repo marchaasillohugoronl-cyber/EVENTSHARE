@@ -9,13 +9,14 @@
   place-items: center;
   position: relative;
   container-type: size;
-  /* Fondo gris con iluminación suave. */
-  background-color: #c8c8c8;
+  /* Atardecer de Arequipa con contraste para destacar las fotografías. */
+  background-color: #34281e;
   background-image:
-    radial-gradient(ellipse at center, #dedede 12%, rgb(222 222 222 / .85) 38%, transparent 78%),
-    linear-gradient(135deg, transparent 35%, rgb(255 255 255 / .15) 50%, transparent 65%),
-    linear-gradient(145deg, #d4d4d4, #b5b5b5);
+    linear-gradient(180deg, rgb(20 12 6 / .12), rgb(20 12 6 / .4)),
+    url('/images/fondo-corazon-arequipa.webp');
   background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
   overflow: hidden;
 }
 
@@ -44,7 +45,7 @@
   aspect-ratio: 100 / 86;
   flex: none;
   z-index: 1;
-  filter: drop-shadow(0 1.5cqh 2.5cqh rgb(25 71 104 / .2));
+  filter: drop-shadow(0 1.5cqh 3cqh rgb(20 12 6 / .55));
 }
 
 .heart-piece {
@@ -93,8 +94,8 @@
   max-width: 32ch;
   text-align: center;
   text-wrap: balance;
-  color: #25445c;
-  opacity: .8;
+  color: #fff;
+  text-shadow: 0 2px 8px #000;
   font-size: clamp(16px, 2vw, 28px);
 }
 

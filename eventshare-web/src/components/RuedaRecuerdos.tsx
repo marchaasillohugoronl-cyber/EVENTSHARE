@@ -143,7 +143,6 @@ export default function RuedaRecuerdos({ posts, name, labels = DEFAULT_LABELS }:
 
   return (
     <div className={`memory-wheel-stage${paused ? ' is-paused' : ''}`}>
-      {featured?.photoUrl && !featuredIsVideo && <img key={`amb-${featured.id}`} className="memory-wheel-ambient" src={featured.photoUrl} alt="" aria-hidden="true" />}
       {/* Izquierda: la rueda */}
       <div className="memory-wheel-side">
         <div className="memory-wheel" role="group" aria-label={`Rueda de recuerdos de ${name}`}>
