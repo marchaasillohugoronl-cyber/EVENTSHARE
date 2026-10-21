@@ -1,0 +1,5 @@
+Tool: built-in image_gen (edit).
+Input: eventshare-web/public/1437058271_153774_1437060693_noticia_normal.jpg
+Output: eventshare-web/public/images/fondo-trio-atardecer-hd.webp
+
+Restore and upscale the reference photograph for a large fullscreen website background. Preserve this exact composition of a city street at sunset: dramatic orange and dark red textured clouds, dark church spires left of center, street lights, buildings and cars in silhouette, road converging into the distance. Remove compression blocks and pixelation; reconstruct crisp natural photographic details while preserving the original architecture, colors, lighting and framing. Do not add objects or text or change the scene. Landscape 3:2, highest available resolution. No blur or artificial sharpening halos.

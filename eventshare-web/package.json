@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "test:grabacion": "node --import tsx scripts/prueba-grabacion.ts",
     "db:migrate": "node scripts/migrar.mjs",
     "test:ratelimit": "node --test scripts/prueba-limite-solicitudes.mjs",
     "test:api": "node --test scripts/prueba-api.mjs",

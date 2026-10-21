@@ -3,9 +3,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { grabarVideo } from '@/lib/grabarVideo';
 
-export default function CamaraVideo({ onComplete, onClose }: {
+export default function CamaraVideo({ onComplete, onClose, onNativeCamera }: {
   onComplete: (file: File) => void;
   onClose: () => void;
+  onNativeCamera: () => void;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const video = useRef<HTMLVideoElement>(null);
@@ -16,18 +17,21 @@ export default function CamaraVideo({ onComplete, onClose }: {
   const [capturing, setCapturing] = useState(false);
   const [seconds, setSeconds] = useState(0);
   const [error, setError] = useState('');
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
     mounted.current = true;
-    dialog.current?.showModal();
+    setError(''); setReady(false); setCapturing(false); setSeconds(0);
+    recording.current = null;
+    if (!dialog.current?.open) dialog.current?.showModal();
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     async function openCamera() {
       try {
-        if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
-          throw new Error('No se puede grabar aquí. Abre el evento en Chrome o Safari mediante HTTPS, o elige un video de la galería.');
-        }
+        if (!window.isSecureContext) throw new Error('Este enlace no usa una conexión segura. Abre el evento con HTTPS para grabar aquí y detener el video automáticamente a los 10 segundos.');
+        if (!navigator.mediaDevices?.getUserMedia) throw new Error('Este navegador no permite abrir la cámara dentro de la página. Abre el enlace en Chrome o Safari y permite el acceso a la cámara.');
+        if (typeof MediaRecorder === 'undefined') throw new Error('Este navegador no admite el grabador con contador. Prueba Chrome o Safari actualizado.');
         const media = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
           audio: true,
@@ -40,7 +44,7 @@ export default function CamaraVideo({ onComplete, onClose }: {
         if (cancelled) return;
         stream.current?.getTracks().forEach(track => track.stop());
         setError(err instanceof DOMException && err.name === 'NotAllowedError'
-          ? 'Permite el acceso a la cámara y al micrófono para grabar. También puedes elegir un video de la galería.'
+          ? 'Permite la cámara y el micrófono en los permisos de este sitio y pulsa Reintentar.'
           : err instanceof Error ? err.message : 'No se pudo abrir la cámara.');
       }
     }
@@ -55,11 +59,12 @@ export default function CamaraVideo({ onComplete, onClose }: {
       document.removeEventListener('visibilitychange', stopWhenHidden);
       document.body.style.overflow = previousOverflow;
     };
-  }, []);
+  }, [attempt]);
 
   function start() {
     if (!stream.current || recording.current) return;
     try {
+      setSeconds(0);
       recording.current = grabarVideo(stream.current, {
         onTime: setSeconds,
         onComplete: file => { if (mounted.current) onComplete(file); },
@@ -74,20 +79,25 @@ export default function CamaraVideo({ onComplete, onClose }: {
     }
   }
 
-  return <dialog ref={dialog} className="recording-dialog" onCancel={e => { e.preventDefault(); onClose(); }}>
+  return <dialog ref={dialog} className="recording-dialog" aria-labelledby="recording-title" onCancel={e => { e.preventDefault(); onClose(); }}>
     <div className="recording-header">
-      <h2>Grabar un momento</h2>
+      <h2 id="recording-title">Grabar un momento</h2>
       <button type="button" className="btn btn-ghost" onClick={onClose}>Cancelar</button>
     </div>
-    <video ref={video} autoPlay muted playsInline className="recording-preview" aria-label="Vista previa de la cámara" />
+    <video ref={video} hidden={!!error} autoPlay muted playsInline className="recording-preview" aria-label="Vista previa de la cámara" />
     <div className="recording-footer">
-      {error ? <p role="alert">{error}</p> : <>
-        <p role="timer" className="recording-timer">{seconds.toFixed(1)} / 10 s</p>
+      {error ? <>
+        <p role="alert">{error}</p>
+        <button type="button" className="btn btn-primary w-full" onClick={() => setAttempt(value => value + 1)}>Reintentar</button>
+        <button type="button" className="btn btn-ghost w-full" onClick={onNativeCamera}>Abrir cámara del teléfono</button>
+        <p className="text-sm">En la cámara del teléfono, detén la grabación antes de 10 segundos. El corte automático solo funciona al grabar dentro de esta página.</p>
+      </> : <>
+        <p role="timer" className="recording-timer">00:{String(Math.floor(seconds)).padStart(2, '0')} / 00:10</p>
         <progress value={seconds} max={10} aria-label="Tiempo grabado" />
         <p className="text-sm">La grabación se detiene sola a los 10 segundos.</p>
         <button type="button" className="btn btn-primary w-full" disabled={!ready}
           onClick={() => capturing ? recording.current?.stop() : start()}>
-          {capturing ? 'Detener y usar video' : ready ? 'Empezar a grabar' : 'Abriendo cámara…'}
+          {capturing ? 'Detener y usar video' : ready ? 'Grabar · 10 segundos' : 'Abriendo cámara…'}
         </button>
       </>}
     </div>

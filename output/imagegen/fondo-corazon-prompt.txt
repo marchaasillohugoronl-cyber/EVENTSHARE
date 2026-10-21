@@ -1,0 +1,4 @@
+Tool: built-in image_gen (edit of user attachment).
+Output: eventshare-web/public/images/fondo-corazon-arequipa.webp
+
+Improve the resolution and restore the attached photograph of Arequipa cathedral at sunset for use as a website background. Preserve the exact cathedral architecture, two towers on the right, plaza and arcades on left, viewpoint, warm sunset and mountains. Faithful photo restoration, remove pixelation and JPEG artifacts, reconstruct fine details without adding objects or text. Landscape 3:2 image at highest available resolution. Keep natural photographic colors.

@@ -1,0 +1,5 @@
+Tool: built-in image_gen (edit).
+Input: eventshare-web/public/images/fondo-muro-tecnologia.jpg
+Output: eventshare-web/public/images/fondo-muro-tecnologia-hd.webp (1536 x 1024).
+
+Restore and upscale this exact image for a fullscreen website background. Preserve composition, robot hand on left, human hand on right, fingertip warm glow, cyan concentric digital circles and exact center text 'AI', dark navy black palette. Remove JPEG pixelation and compression artifacts, reconstruct crisp natural fine detail, keep anatomy and all placement faithful. No added elements or text. Output high resolution ideally 3072x2048 at the original 3:2 aspect ratio. Save the resulting image as a local file for use in the website.

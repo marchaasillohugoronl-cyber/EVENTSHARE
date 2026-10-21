@@ -28,6 +28,7 @@ export default function UploadForm({ event }: { event: PublicEvent }) {
   const validatedVideo = useRef<File | null>(null);
   const publishing = useRef(false);
   const cameraRef = useRef<HTMLInputElement>(null);
+  const nativeVideoRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -41,6 +42,7 @@ export default function UploadForm({ event }: { event: PublicEvent }) {
     const selected = e.target.files?.[0];
     e.target.value = '';
     if (!selected) return;
+    setCameraOpen(false);
     setError(null);
     setChecking(true);
     setFile(null);
@@ -113,8 +115,9 @@ export default function UploadForm({ event }: { event: PublicEvent }) {
         <p className="mt-2 text-sm text-muted">Elige una foto o graba hasta 10 segundos.</p>
       </header>
       <input ref={cameraRef} type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden onChange={onPick} />
+      <input ref={nativeVideoRef} type="file" accept="video/*" capture="environment" hidden onChange={onPick} />
       <input ref={galleryRef} type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" hidden onChange={onPick} />
-      {cameraOpen && <CamaraVideo onComplete={useRecording} onClose={() => setCameraOpen(false)} />}
+      {cameraOpen && <CamaraVideo onComplete={useRecording} onClose={() => setCameraOpen(false)} onNativeCamera={() => { setCameraOpen(false); nativeVideoRef.current?.click(); }} />}
 
       {preview && file ? (
         <section className="upload-preview" aria-label="Vista previa de tu publicación">

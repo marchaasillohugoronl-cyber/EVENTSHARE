@@ -1,0 +1,4 @@
+Tool: built-in image_gen (edit of user attachment).
+Output: eventshare-web/public/images/fondo-collage-condor.webp (1536 x 1024).
+
+Restore and improve the attached photograph for a fullscreen website background. Preserve the rocky Andean canyon, snowy distant ridge, blue sky and clouds, and the single flying condor near the upper left mountain ridge. Remove JPEG artifacts and pixelation and reconstruct natural photographic detail. Adapt to a landscape 3:2 frame by extending the scenery at the sides, without stretching the original scene. Keep the condor visible and faithful, no added birds, buildings, text or logos. Highest available resolution, natural colors, realistic rock textures.
