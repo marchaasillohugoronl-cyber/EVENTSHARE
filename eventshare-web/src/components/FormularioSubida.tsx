@@ -1,9 +1,7 @@
 'use client';
 
-import { validarVideo } from '@/lib/video';
 import Link from 'next/link';
-import { Camera, Video, Images, Upload, Check } from 'lucide-react';
-import CamaraVideo from './CamaraVideo';
+import { Camera, Images, Upload, Check } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { api, errorMessage } from '@/lib/api';
@@ -22,13 +20,9 @@ export default function UploadForm({ event }: { event: PublicEvent }) {
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
-  const [cameraOpen, setCameraOpen] = useState(false);
-  const [checking, setChecking] = useState(false);
   const [phase, setPhase] = useState('');
-  const validatedVideo = useRef<File | null>(null);
   const publishing = useRef(false);
   const cameraRef = useRef<HTMLInputElement>(null);
-  const nativeVideoRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -38,36 +32,20 @@ export default function UploadForm({ event }: { event: PublicEvent }) {
     return () => URL.revokeObjectURL(url);
   }, [file]);
 
-  async function onPick(e: React.ChangeEvent<HTMLInputElement>) {
+  function onPick(e: React.ChangeEvent<HTMLInputElement>) {
     const selected = e.target.files?.[0];
     e.target.value = '';
     if (!selected) return;
-    setCameraOpen(false);
     setError(null);
-    setChecking(true);
-    setFile(null);
-    validatedVideo.current = null;
-    try {
-      if (selected.type.startsWith('video/')) {
-        await validarVideo(selected);
-        validatedVideo.current = selected;
-      }
-      setFile(selected);
-    } catch (err) { setError(errorMessage(err)); }
-    finally { setChecking(false); }
-  }
-
-  function useRecording(recorded: File) {
-    // MediaRecorder corta esta captura a los 10 s y controla su tamaño.
-    // WebM grabado en vivo puede no incluir duración en sus metadatos.
-    validatedVideo.current = recorded;
-    setFile(recorded);
-    setError(null);
-    setCameraOpen(false);
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(selected.type)) {
+      setError('Selecciona una foto JPG, PNG o WebP.');
+      return;
+    }
+    setFile(selected);
   }
 
   async function publish() {
-    if (!file) return setError('Agrega una foto o un video.');
+    if (!file) return setError('Agrega una foto.');
     if (publishing.current) return;
     publishing.current = true;
     setBusy(true);
@@ -78,7 +56,7 @@ export default function UploadForm({ event }: { event: PublicEvent }) {
       if (!(await ensureIdentity(event.code))) return;
       let key: string | undefined;
       if (file) {
-        const blob = file.type.startsWith('video/') ? (validatedVideo.current === file ? file : await validarVideo(file)) : await prepareImage(file);
+        const blob = await prepareImage(file);
         const p = await api<Presign>(`/events/${event.id}/uploads`, { method: 'POST', json: { contentType: blob.type, size: blob.size } });
         setPhase('Subiendo tu momento…');
         await uploadWithProgress(p.uploadUrl, blob, p.fields, setProgress);
@@ -112,34 +90,27 @@ export default function UploadForm({ event }: { event: PublicEvent }) {
     <div className="upload-flow">
       <header>
         <h1 className="font-serif text-3xl">Comparte un momento</h1>
-        <p className="mt-2 text-sm text-muted">Elige una foto o graba hasta 10 segundos.</p>
+        <p className="mt-2 text-sm text-muted">Toma una foto o elige una de tu galería.</p>
       </header>
       <input ref={cameraRef} type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden onChange={onPick} />
-      <input ref={nativeVideoRef} type="file" accept="video/*" capture="environment" hidden onChange={onPick} />
-      <input ref={galleryRef} type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime" hidden onChange={onPick} />
-      {cameraOpen && <CamaraVideo onComplete={useRecording} onClose={() => setCameraOpen(false)} onNativeCamera={() => { setCameraOpen(false); nativeVideoRef.current?.click(); }} />}
+      <input ref={galleryRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={onPick} />
 
       {preview && file ? (
         <section className="upload-preview" aria-label="Vista previa de tu publicación">
           <div className="upload-preview-heading"><span><Check size={16} aria-hidden="true" />Tu momento está listo</span>
-            <button type="button" onClick={() => { setFile(null); validatedVideo.current = null; }} disabled={busy}>Cambiar</button>
+            <button type="button" onClick={() => setFile(null)} disabled={busy}>Cambiar</button>
           </div>
-          {file.type.startsWith('video/')
-            ? <video src={preview} controls playsInline />
-            : <img src={preview} alt="Vista previa de tu foto" />}
+          <img src={preview} alt="Vista previa de tu foto" />
         </section>
-      ) : checking ? <div className="upload-checking" role="status">Revisando tu video…</div> : (
+      ) : (
         <div className="upload-options">
           <button type="button" className="btn btn-primary" onClick={() => cameraRef.current?.click()} disabled={busy}>
             <Camera aria-hidden="true" />Tomar foto
           </button>
-          <button type="button" className="btn btn-primary" onClick={() => { setError(null); setCameraOpen(true); }} disabled={busy}>
-            <Video aria-hidden="true" />Grabar video
-          </button>
-          <button type="button" className="btn btn-ghost upload-gallery" onClick={() => galleryRef.current?.click()} disabled={busy}>
+          <button type="button" className="btn btn-ghost" onClick={() => galleryRef.current?.click()} disabled={busy}>
             <Images aria-hidden="true" />Elegir de la galería
           </button>
-          <p className="text-center text-xs text-muted upload-gallery">Videos MP4, WebM o MOV · Hasta 10 s y 50 MB.</p>
+          <p className="text-center text-xs text-muted upload-gallery">Fotos JPG, PNG o WebP.</p>
         </div>
       )}
 
@@ -149,10 +120,10 @@ export default function UploadForm({ event }: { event: PublicEvent }) {
           <progress className="upload-progress" value={progress} max={100} aria-label="Progreso de subida" />
           <p className="mt-1 text-sm">{phase}{phase.startsWith('Subiendo') ? ` ${progress}%` : ''}</p>
         </div>}
-        <button type="button" className="btn btn-primary w-full" onClick={publish} disabled={busy || checking || !file}>
+        <button type="button" className="btn btn-primary w-full" onClick={publish} disabled={busy || !file}>
           <Upload size={20} aria-hidden="true" />{busy ? 'Publicando…' : 'Publicar momento'}
         </button>
-        {!file && !busy && <p className="mt-2 text-center text-xs text-muted">Selecciona una foto o video para continuar.</p>}
+        {!file && !busy && <p className="mt-2 text-center text-xs text-muted">Selecciona una foto para continuar.</p>}
         {event.moderationEnabled && <p className="mt-2 text-center text-xs text-muted">Tu publicación aparecerá después de la revisión del anfitrión.</p>}
       </div>
     </div>

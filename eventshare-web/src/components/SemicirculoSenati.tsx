@@ -95,10 +95,7 @@ export default function SemicirculoSenati({ posts, name }: { posts: Post[]; name
       </div>
       <div className="semicircle-center">
         <MarcaSenati />
-        <span className="semicircle-spark" aria-hidden="true">✦</span>
-        <p className="semicircle-eyebrow">TALENTO QUE NOS UNE</p>
         <h2>{name}</h2>
-        <div className="semicircle-rule" />
         <p className="semicircle-message">Creamos el futuro.<br />Compartimos el momento.</p>
         <span className="semicircle-invite">ESCANEA EL QR Y PARTICIPA</span>
       </div>

@@ -93,6 +93,13 @@ export default function CollageGeometrico({ photos, interactive = false, fillFra
             preserveAspectRatio="xMidYMid slice"
             onError={() => setFailed(previous => new Set(previous).add(photo.url))}
           />}
+          <rect
+            x={box.x + 3}
+            y={box.y + 3}
+            width={box.width - 6}
+            height={box.height - 6}
+            className="collage-photo-border"
+          />
         </>;
         return (
           <g

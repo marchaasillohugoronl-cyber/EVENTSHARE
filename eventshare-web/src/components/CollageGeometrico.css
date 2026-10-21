@@ -88,6 +88,13 @@
   animation-delay: calc(var(--i, 0) * 90ms);
 }
 
+.collage-photo-border {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 6;
+  pointer-events: none;
+}
+
 .collage-tile image {
   filter: drop-shadow(0 1px 2px rgb(0 0 0 / 18%));
 }

@@ -53,9 +53,9 @@ export default function PortadaSenati({ event }: { event: PublicEvent }) {
           {formatDate(event.eventDate) && <p>{formatDate(event.eventDate)}</p>}
           {event.description && <p className="whitespace-pre-line">{event.description}</p>}
           <div className="senati-actions">
-            {event.status === 'ACTIVE' ? <Link href={`/e/${event.code}/upload`} className="btn btn-primary">Compartir foto o video ↗</Link> : <p>El evento está cerrado. Disfruta los recuerdos del álbum.</p>}
+            {event.status === 'ACTIVE' ? <Link href={`/e/${event.code}/upload`} className="btn btn-primary">Compartir una foto ↗</Link> : <p>El evento está cerrado. Disfruta los recuerdos del álbum.</p>}
             <Link href={`/e/${event.code}/photos`} className="btn btn-ghost">Ver álbum</Link>
-          </div><p className="senati-note">Videos de hasta 10 segundos.</p>
+          </div><p className="senati-note">Comparte tus mejores fotos del evento.</p>
           {error && <p role="status" className="text-sm">No se pudo actualizar el collage. Se reintentará automáticamente.</p>}
         </div>
         {qr && <details className="senati-qr"><summary><img src={qr} width="92" height="92" alt="QR para entrar al evento" /><span>Escanea y participa<br /><small>Ampliar QR</small></span></summary><img src={qr} width="256" height="256" alt={`QR del evento ${event.name}`} /><p className="text-center text-xs">Código: {event.code}</p></details>}

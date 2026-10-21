@@ -2,28 +2,74 @@
 .semicircle-composition { --wheel-size: min(96cqw, 150cqh); position: absolute; left: 50%; bottom: 0; transform: translateX(-50%); width: var(--wheel-size); height: calc(var(--wheel-size) / 2); }
 .semicircle-mask { position: absolute; width: 100%; height: 100%; overflow: hidden; }
 .semicircle-ring { position: absolute; width: var(--wheel-size); height: var(--wheel-size); left: 0; top: 0; animation: senati-semicircle-turn 40s linear infinite; }
+/* Bordes continuos alineados con los radios exterior (49%) e interior (23%). */
+.semicircle-ring::before,
+.semicircle-ring::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  box-sizing: border-box;
+  border: clamp(2px, .45cqh, 6px) solid #fff;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 8px rgb(0 0 0 / .25);
+}
+.semicircle-ring::before { inset: 1%; }
+.semicircle-ring::after { inset: 27%; }
 .semicircle-piece { position: absolute; inset: 0; transform-origin: center; background: #141820; }
 .semicircle-photo { position: absolute; left: 71%; top: 29%; width: 29%; height: 42%; overflow: hidden; }
 .semicircle-photo :is(img, video) { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.08); }
 .semicircle-placeholder { width: 100%; height: 100%; background: linear-gradient(145deg, #1633f2, #05123e); display: grid; place-items: center; }
 .semicircle-placeholder .marca-senati { color: white; transform: rotate(90deg); }
 .semicircle-caption { position: absolute; left: 78%; top: 48%; width: 21%; padding: .35% .4%; background: #030406; border-block: 1px solid #ffffff50; color: #fff; font-family: Georgia, serif; text-transform: uppercase; text-align: center; font-size: clamp(8px, 1.25cqh, 20px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transform: rotate(-18deg); transform-origin: -133.333% 50%; }
-.semicircle-center { position: absolute; left: 50%; bottom: max(72px, 8cqh); transform: translateX(-50%); width: 48%; display: flex; align-items: center; flex-direction: column; text-align: center; gap: .8cqh; }
-.semicircle-center .marca-senati { color: #fff; flex-direction: column; gap: 1cqh; }
-.semicircle-center .marca-senati svg { width: 8cqh; height: 6.6cqh; }
-.semicircle-center .marca-senati > span { font-size: clamp(13px, 2.3cqh, 35px); letter-spacing: .13em; }
-.semicircle-spark { color: #4ee7ff; font-size: 3cqh; line-height: 1; }
-.semicircle-eyebrow { font-size: clamp(7px, 1cqh, 16px); letter-spacing: .12em; color: #c2c8d2; }
-.semicircle-center h2 { font-family: Georgia, serif; font-size: clamp(18px, 3.2cqh, 48px); text-transform: uppercase; letter-spacing: .04em; line-height: 1.1; overflow-wrap: anywhere; max-height: 14cqh; overflow: hidden; }
-.semicircle-rule { height: 1px; width: 45%; background: #4ee7ff80; }
-.semicircle-message { font-family: Georgia, serif; font-style: italic; font-size: clamp(10px, 1.65cqh, 25px); line-height: 1.5; color: #d4d8df; }
-.semicircle-invite { margin-top: 1cqh; padding: .65cqh 1cqh; background: #1434bc; color: white; font-size: clamp(7px, .95cqh, 15px); letter-spacing: .05em; }
-.semicircle-controls { position: absolute; bottom: max(18px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 6; }
+/* Rectángulo seguro inscrito en el semicírculo interior (radio 23%). */
+.semicircle-center {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--wheel-size) * .01);
+  transform: translateX(-50%);
+  width: calc(var(--wheel-size) * .28);
+  height: calc(var(--wheel-size) * .17);
+  container-type: inline-size;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  gap: calc(var(--wheel-size) * .003);
+  overflow: hidden;
+}
+.semicircle-center > * { flex-shrink: 0; margin: 0; max-width: 100%; }
+.semicircle-center .marca-senati { color: #fff; flex-direction: column; gap: 1.07cqw; }
+.semicircle-center .marca-senati svg { width: 14.3cqw; height: 11.4cqw; }
+.semicircle-center .marca-senati > span { font-size: 4.3cqw; line-height: 1.1; letter-spacing: .13em; }
+.semicircle-center h2 {
+  font-family: Georgia, serif;
+  font-size: 6.8cqw;
+  text-transform: uppercase;
+  letter-spacing: .025em;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.semicircle-message { font-family: Georgia, serif; font-style: italic; font-size: 3.6cqw; line-height: 1.3; color: #d4d8df; }
+.semicircle-invite { padding: 1.4cqw 2.1cqw; background: #1434bc; color: white; font-size: 2.9cqw; line-height: 1.2; letter-spacing: .03em; }
+/* En espacios pequeños prioriza el logo y el nombre, sin sacar textos del círculo. */
+@container (max-width: 220px) {
+  .semicircle-center .marca-senati > span,
+  .semicircle-message,
+  .semicircle-invite { display: none; }
+  .semicircle-center h2 { font-size: clamp(10px, 7cqw, 16px); }
+  .semicircle-center .marca-senati svg { width: 20cqw; height: 16cqw; }
+}
+.semicircle-controls { position: absolute; bottom: max(120px, calc(env(safe-area-inset-bottom) + 100px)); left: max(18px, env(safe-area-inset-left)); z-index: 6; }
 .semicircle-controls button { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 16px; background: #080c14dd; border: 1px solid #ffffff40; border-radius: 24px; color: #cbd6e8; font-size: 12px; }
 .semicircle-controls button:disabled { opacity: .6; }
 .senati-semicircle.is-stopped .semicircle-ring { animation-play-state: paused; }
 @keyframes senati-semicircle-turn { to { transform: rotate(360deg); } }
-@media (max-aspect-ratio: 1/1) { .semicircle-center { bottom: calc(100% + 3cqh); width: 80%; gap: 1cqh; } .semicircle-center .marca-senati svg { width: 7cqw; height: 6cqw; } .semicircle-center h2 { font-size: 5cqw; } .semicircle-message { font-size: 2.8cqw; } .semicircle-center .marca-senati > span { font-size: 3.5cqw; } }
 @media (prefers-reduced-motion: reduce) { .semicircle-ring { animation: none; } }
 
 .semicircle-background { position: absolute; inset: 0; pointer-events: none; opacity: .3; }
