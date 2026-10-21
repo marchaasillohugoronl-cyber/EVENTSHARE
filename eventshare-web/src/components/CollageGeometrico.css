@@ -1,121 +1,254 @@
-/* ===== Collage geométrico: mosaico editorial sobre fondo blanco ===== */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@800&family=Poppins:wght@400;500;600;700&family=Permanent+Marker&display=swap');
+
+/* ===== Collage geométrico: responsive, editorial y optimizado ===== */
 
 .geometric-collage {
   --paper: #fff;
   --ink: #111;
-  --muted: #333;
+  --muted: #454545;
   --accent-red: #d62839;
   --accent-blue: #1d4fb8;
-  --font-serif: 'Playfair Display', Georgia, serif;
-  --font-ui: 'Poppins', system-ui, sans-serif;
-  --font-hand: 'Permanent Marker', 'Comic Sans MS', cursive;
+
+  --f-serif: var(--font-serif, "Playfair Display"),
+    "Times New Roman", serif;
+  --f-ui: var(--font-ui, "Poppins"),
+    system-ui, "Segoe UI", Arial, sans-serif;
+  --f-hand: var(--font-hand, "Permanent Marker"),
+    Impact, "Arial Narrow", sans-serif;
+
+  --collage-ratio: 740 / 1290;
+  --small-text: 13.5px;
+  --body-text: 14px;
+  --tv-zoom: 1.06;
 
   display: block;
+  box-sizing: border-box;
   width: 100%;
   height: auto;
+  aspect-ratio: var(--collage-ratio);
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--font-ui);
+  font-family: var(--f-ui);
+  font-synthesis: none;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
 }
-.geometric-collage--fill, .tv-slide > .geometric-collage { height: 100%; }
-/* Que las barras laterales de la TV sean blancas también */
-.tv-slide:has(> .geometric-collage) { background: #fff; }
 
-/* ---------- Piezas (fotos) ---------- */
-/* Las separaciones finas y blancas salen del layout; aquí damos profundidad suave. */
+.geometric-collage image {
+  image-rendering: auto;
+}
+
+/* El SVG conserva sus proporciones y queda dentro del área segura. */
+.tv-slide:has(> .geometric-collage) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: clamp(8px, 1.5vmin, 32px);
+  overflow: hidden;
+  background: var(--paper, #fff);
+}
+
+.tv-slide > .geometric-collage,
+.geometric-collage--fill {
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  flex: 0 1 auto;
+  margin-inline: auto;
+}
+
+/* Zoom moderado: evita recortar el contenido periférico. */
+@media (min-aspect-ratio: 1 / 1) {
+  .geometric-collage--fill,
+  .tv-slide > .geometric-collage {
+    transform: scale(var(--tv-zoom));
+    transform-origin: center;
+  }
+}
+
+/* Entrada escalonada de las piezas. */
 .collage-tile {
   transform-box: fill-box;
   transform-origin: center;
-  animation: collage-in 720ms cubic-bezier(.16, 1, .3, 1) both;
-  animation-delay: calc(var(--i, 0) * 45ms);
-}
-.collage-tile image {
-  filter: drop-shadow(0 1px 2px rgb(0 0 0 / .18));
-}
-@keyframes collage-in {
-  from { opacity: 0; transform: translateY(1.2%) scale(.975); }
-  to   { opacity: 1; transform: scale(1); }
+  animation: collage-in 650ms cubic-bezier(.16, 1, .3, 1) both;
+  animation-delay: calc(var(--i, 0) * 24ms);
 }
 
-/* ---------- Textos editoriales (unidades del viewBox, pensado para ~740 de ancho) ---------- */
-.collage-title {                 /* "Capture The Moment" */
-  font-family: var(--font-serif);
-  font-weight: 800;
+.collage-tile image {
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 18%));
+}
+
+@keyframes collage-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Tipografía SVG: las medidas siguen las unidades del viewBox. */
+.collage-title {
+  font-family: var(--f-serif);
   font-size: 40px;
-  line-height: 1.05;
-  letter-spacing: -.01em;
+  font-weight: 800;
+  letter-spacing: -.025em;
   fill: var(--ink);
 }
-.collage-subtitle {              /* "semuanya untuk keluarga" */
-  font-size: 12.5px;
+
+.collage-subtitle {
+  font-family: var(--f-ui);
+  font-size: var(--body-text);
   font-weight: 400;
   fill: var(--ink);
 }
-.collage-rule {                  /* raya corta bajo el subtítulo */
+
+.collage-rule {
   stroke: var(--ink);
   stroke-width: 1.5;
+  shape-rendering: geometricPrecision;
 }
-.collage-name {                  /* nombre en letra de marcador */
-  font-family: var(--font-hand);
+
+.collage-name {
+  font-family: var(--f-hand);
   font-size: 14.5px;
   letter-spacing: .02em;
-  text-transform: uppercase;
   fill: var(--ink);
 }
-.collage-slogan {                /* "GOOD DAY & GOOD PEOPLE" */
-  font-family: var(--font-hand);
+
+.collage-slogan {
+  font-family: var(--f-hand);
   font-size: 22px;
-  line-height: 1;
   fill: var(--ink);
 }
-.collage-slogan.is-red, .collage-slogan .is-red,  .collage-accent-red  { fill: var(--accent-red);  font-size: 32px; }
-.collage-slogan.is-blue, .collage-slogan .is-blue, .collage-accent-blue { fill: var(--accent-blue); font-size: 29px; }
-.collage-badge {                 /* números sueltos: 10, 28, 24 */
+
+.collage-slogan .is-red {
+  fill: var(--accent-red);
+  font-size: 32px;
+}
+
+.collage-slogan .is-blue {
+  fill: var(--accent-blue);
+  font-size: 29px;
+}
+
+.collage-badge {
+  font-family: var(--f-ui);
   font-size: 19px;
   font-weight: 700;
   fill: var(--ink);
 }
-.collage-label {                 /* "WIS - UDAH" */
-  font-size: 11.5px;
-  font-weight: 500;
-  letter-spacing: .02em;
+
+.collage-label {
+  font-size: var(--small-text);
+  font-weight: 600;
+  letter-spacing: .04em;
   fill: var(--ink);
 }
-.collage-credit {                /* "Instastories by" */
-  font-size: 11.5px;
+
+.collage-credit {
+  font-size: var(--small-text);
   font-weight: 400;
+  fill: var(--muted);
+}
+
+.collage-credit.is-bold {
+  font-size: 14.5px;
+  font-weight: 700;
   fill: var(--ink);
 }
-.collage-credit.is-bold,
-.collage-credit strong,
-.collage-credit .is-bold { font-size: 14.5px; font-weight: 700; }
-.collage-caption {               /* párrafo de agradecimiento */
-  font-size: 11.5px;
+
+.collage-caption {
+  font-family: var(--f-ui);
+  font-size: var(--small-text);
   font-weight: 400;
-  line-height: 1.5;
   text-anchor: middle;
   fill: var(--muted);
 }
-.collage-hashtag {               /* "#ThePowerOfFamily" */
+
+.collage-hashtag {
+  font-family: var(--f-ui);
   font-size: 17px;
   font-weight: 700;
   text-anchor: middle;
   fill: var(--ink);
 }
 
-/* ---------- Interacción solo en piezas con enlace ---------- */
-.collage-tile--link a { cursor: pointer; outline: none; }
-.collage-tile--link image { transition: filter 220ms ease, opacity 220ms ease; }
-.collage-tile--link a:hover image,
-.collage-tile--link a:focus-visible image {
-  filter: brightness(1.08) saturate(1.1) drop-shadow(0 2px 6px rgb(0 0 0 / .3));
+/* Interacción accesible. */
+.collage-tile--link a {
+  cursor: pointer;
+  outline: none;
 }
 
-.collage-focus-ring { pointer-events: none; stroke: transparent; stroke-width: 6; stroke-linejoin: round; }
-.collage-tile--link a:focus-visible .collage-focus-ring { stroke: var(--accent-blue); }
+.collage-tile--link image {
+  transition: filter 200ms ease;
+}
 
+@media (hover: hover) and (pointer: fine) {
+  .collage-tile--link a:hover image {
+    filter: brightness(1.07) saturate(1.08)
+      drop-shadow(0 2px 5px rgb(0 0 0 / 25%));
+  }
+}
+
+.collage-focus-ring {
+  pointer-events: none;
+  stroke: transparent;
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+
+.collage-tile--link a:focus-visible .collage-focus-ring {
+  stroke: var(--accent-blue);
+}
+
+/* Ajustes de lectura según el tamaño de pantalla. */
+@media (max-width: 480px) {
+  .geometric-collage {
+    --small-text: 12.5px;
+    --body-text: 13.5px;
+  }
+
+  .collage-tile {
+    animation-duration: 400ms;
+    animation-delay: 0ms;
+  }
+}
+
+@media (min-width: 1920px) {
+  .geometric-collage {
+    --small-text: 14.5px;
+    --body-text: 15px;
+  }
+
+  .collage-name {
+    font-size: 15.5px;
+  }
+
+  .collage-badge {
+    font-size: 20px;
+  }
+
+  .collage-hashtag {
+    font-size: 18px;
+  }
+}
+
+/* Respeta la configuración de accesibilidad del sistema. */
 @media (prefers-reduced-motion: reduce) {
-  .collage-tile { animation: none; }
-  .collage-tile--link image { transition: none; }
+  .collage-tile {
+    animation: none !important;
+  }
+
+  .collage-tile--link image {
+    transition: none;
+  }
+}
+
+/* Modo de pantalla completa. */
+.tv-slide:has(> .geometric-collage):fullscreen {
+  cursor: none;
 }

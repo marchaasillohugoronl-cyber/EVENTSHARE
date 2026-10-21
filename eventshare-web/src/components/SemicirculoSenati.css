@@ -1,28 +1,194 @@
-.senati-semicircle { position: relative; width: 100%; height: 100%; overflow: hidden; container-type: size; background: #030406; color: #fff; display: grid; place-items: center; }
-.semicircle-composition { position: relative; width: min(58cqh, 90cqw); height: min(94cqh, 146cqw); }
-.semicircle-mask { position: absolute; width: 100%; height: 100%; overflow: hidden; }
-.semicircle-ring { position: absolute; width: min(94cqh, 146cqw); height: min(94cqh, 146cqw); left: calc(min(94cqh, 146cqw) * -.5); top: 0; animation: senati-semicircle-turn 40s linear infinite; }
-.semicircle-piece { position: absolute; inset: 0; transform-origin: center; background: #141820; }
-.semicircle-photo { position: absolute; left: 75%; top: 29%; width: 25%; height: 42%; overflow: hidden; }
-.semicircle-photo :is(img, video) { display: block; width: 100%; height: 100%; object-fit: cover; filter: grayscale(1) contrast(1.08); }
-.semicircle-placeholder { width: 100%; height: 100%; background: linear-gradient(145deg, #1633f2, #05123e); display: grid; place-items: center; }
-.semicircle-placeholder .marca-senati { color: white; transform: rotate(90deg); }
-.semicircle-caption { position: absolute; left: 78%; top: 48%; width: 21%; padding: .35% .4%; background: #030406; border-block: 1px solid #ffffff50; color: #fff; font-family: Georgia, serif; text-transform: uppercase; text-align: center; font-size: clamp(8px, 1.25cqh, 20px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transform: rotate(-18deg); transform-origin: -133.333% 50%; }
-.semicircle-center { position: absolute; left: 0; top: 50%; transform: translateY(-50%); width: 46%; display: flex; align-items: center; flex-direction: column; text-align: center; gap: 1.6cqh; }
-.semicircle-center .marca-senati { color: #fff; flex-direction: column; gap: 1cqh; }
-.semicircle-center .marca-senati svg { width: 8cqh; height: 6.6cqh; }
-.semicircle-center .marca-senati > span { font-size: clamp(13px, 2.3cqh, 35px); letter-spacing: .13em; }
-.semicircle-spark { color: #4ee7ff; font-size: 3cqh; line-height: 1; }
-.semicircle-eyebrow { font-size: clamp(7px, 1cqh, 16px); letter-spacing: .12em; color: #c2c8d2; }
-.semicircle-center h2 { font-family: Georgia, serif; font-size: clamp(18px, 3.2cqh, 48px); text-transform: uppercase; letter-spacing: .04em; line-height: 1.1; overflow-wrap: anywhere; max-height: 14cqh; overflow: hidden; }
-.semicircle-rule { height: 1px; width: 45%; background: #4ee7ff80; }
-.semicircle-message { font-family: Georgia, serif; font-style: italic; font-size: clamp(10px, 1.65cqh, 25px); line-height: 1.5; color: #d4d8df; }
-.semicircle-invite { margin-top: 1cqh; padding: .65cqh 1cqh; background: #1434bc; color: white; font-size: clamp(7px, .95cqh, 15px); letter-spacing: .05em; }
-.semicircle-controls { position: absolute; bottom: max(18px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); z-index: 6; }
-.semicircle-controls button { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 16px; background: #080c14dd; border: 1px solid #ffffff40; border-radius: 24px; color: #cbd6e8; font-size: 12px; }
-.semicircle-controls button:disabled { opacity: .6; }
-.senati-semicircle.is-stopped .semicircle-ring { animation-play-state: paused; }
-@keyframes senati-semicircle-turn { to { transform: rotate(360deg); } }
-@media (max-aspect-ratio: 3/4) { .semicircle-center { gap: 1cqh; } .semicircle-center .marca-senati svg { width: 7cqw; height: 6cqw; } .semicircle-center h2 { font-size: 5cqw; } .semicircle-message { font-size: 2.8cqw; } .semicircle-center .marca-senati > span { font-size: 3.5cqw; } }
-@media (prefers-reduced-motion: reduce) { .semicircle-ring { animation: none; } }
+/* ===== Semicírculo SENATI: texto a la izquierda, semicírculo de fotos en la mitad derecha ===== */
 
+.senati-semicircle {
+  /* ---- Ajustes rápidos ---- */
+  --sc-bg: #061526;            /* fondo */
+  --sc-ink: #fff;              /* color del texto */
+  --sc-accent: #4da3ff;        /* detalles (raya, destellos) */
+  --sc-gap: #061526;           /* color de la separación entre fotos */
+  --ring-scale: 1;             /* 1 = el semicírculo ocupa todo el alto; 1.2 = se sale un poco arriba y abajo */
+  --ring-margin: 3cqw;         /* separación del borde derecho de la pantalla */
+  --spin: 120s;                /* tiempo de una vuelta completa */
+
+  /* R = radio exterior del semicírculo; S = lado del cuadrado que contiene el anillo completo.
+     El recorte de cada pieza usa radio exterior 49% y radio interior 29% de ese cuadrado. */
+  /* En 16:9 el semicírculo mide ~48% del ancho (la mitad derecha) y se sale un poco por arriba y abajo.
+     Para verlo completo y más pequeño pon --R: 50cqh. */
+  --R: clamp(calc(50cqh * var(--ring-scale)), 48cqw, 86cqh);
+  --S: calc(var(--R) / .49);
+
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  container-type: size;
+  isolation: isolate;
+  background: var(--sc-bg);
+  color: var(--sc-ink);
+  font-family: var(--font-ui, 'Poppins'), system-ui, 'Segoe UI', Arial, sans-serif;
+}
+
+.semicircle-composition { position: absolute; inset: 0; }
+
+/* ---------- Semicírculo: máscara fija que deja ver solo la mitad derecha del anillo ---------- */
+.semicircle-mask {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  right: var(--ring-margin);
+  width: var(--R);
+  height: calc(var(--R) * 2);
+  transform: translateY(-50%);
+  overflow: hidden;
+}
+/* El anillo es un cuadrado S x S cuyo centro queda en el borde izquierdo de la máscara. */
+.semicircle-ring {
+  position: absolute;
+  left: calc(var(--S) / -2);
+  top: 50%;
+  width: var(--S);
+  height: var(--S);
+  margin-top: calc(var(--S) / -2);
+  animation: semicircle-spin var(--spin) linear infinite;
+  will-change: transform;
+}
+.is-stopped .semicircle-ring { animation-play-state: paused; }
+@keyframes semicircle-spin { to { transform: rotate(360deg); } }
+
+.semicircle-piece {
+  position: absolute;
+  inset: 0;
+  /* clip-path lo pone el componente (cuña de 44° entre los radios 29% y 49%) */
+}
+.semicircle-photo { position: absolute; inset: 0; background: #0d2a47; }
+.semicircle-photo img,
+.semicircle-photo video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.semicircle-placeholder {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #123a63, #0a1f38);
+}
+.semicircle-placeholder svg { width: 22%; height: auto; opacity: .85; }
+
+/* Nombre del autor, a lo largo de la cuña (gira con ella) */
+.semicircle-caption {
+  position: absolute;
+  left: calc(50% + var(--S) * .39);
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(90deg);
+  padding: .35em .9em;
+  background: rgb(6 21 38 / .62);
+  backdrop-filter: blur(4px);
+  font-size: clamp(11px, calc(var(--S) * .0125), 26px);
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #fff;
+  pointer-events: none;
+}
+
+/* ---------- Texto: ocupa la mitad izquierda ---------- */
+.semicircle-center {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  /* hasta el borde izquierdo del semicírculo */
+  right: calc(var(--R) + var(--ring-margin));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2.2cqh;
+  box-sizing: border-box;
+  /* deja libre la esquina izquierda donde la TV dibuja la mascota y el logo */
+  padding: 6cqh 4cqw 6cqh max(11cqw, 150px);
+}
+.semicircle-center > svg { width: clamp(70px, 9cqh, 160px); height: auto; }
+.semicircle-spark { font-size: 4.2cqh; line-height: 1; color: var(--sc-accent); }
+.semicircle-eyebrow {
+  margin: 0;
+  font-size: clamp(16px, 2.4cqh, 44px);
+  font-weight: 600;
+  letter-spacing: .32em;
+  color: var(--sc-accent);
+}
+.semicircle-center h2 {
+  margin: 0;
+  font-family: var(--font-serif, 'Playfair Display'), 'Times New Roman', serif;
+  font-weight: 800;
+  font-size: clamp(44px, 9.5cqh, 200px);
+  line-height: 1.02;
+  letter-spacing: -.015em;
+  text-wrap: balance;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.semicircle-rule { width: 9cqh; height: .5cqh; min-height: 3px; background: var(--sc-accent); }
+.semicircle-message {
+  margin: 0;
+  font-size: clamp(22px, 3.6cqh, 64px);
+  font-weight: 500;
+  line-height: 1.35;
+  color: rgb(255 255 255 / .92);
+}
+.semicircle-invite {
+  margin-top: 1cqh;
+  padding: 1.3cqh 2.6cqh;
+  border: max(2px, .25cqh) solid rgb(255 255 255 / .75);
+  border-radius: 999px;
+  font-size: clamp(14px, 2cqh, 36px);
+  font-weight: 600;
+  letter-spacing: .2em;
+}
+
+/* ---------- Botón de pausa (discreto; en TV casi no se ve) ---------- */
+.semicircle-controls {
+  position: absolute;
+  z-index: 3;
+  left: max(11cqw, 150px);
+  bottom: 2.4cqh;
+  opacity: .35;
+  transition: opacity 200ms ease;
+}
+.semicircle-controls:hover,
+.semicircle-controls:focus-within { opacity: 1; }
+.semicircle-controls button {
+  display: inline-flex;
+  align-items: center;
+  gap: .5em;
+  padding: .5em 1em;
+  border: 1px solid rgb(255 255 255 / .5);
+  border-radius: 999px;
+  background: rgb(255 255 255 / .08);
+  color: #fff;
+  font: 500 clamp(12px, 1.5cqh, 20px) var(--font-ui, 'Poppins'), system-ui, sans-serif;
+  cursor: pointer;
+}
+.semicircle-controls button:disabled { cursor: default; opacity: .7; }
+
+/* ---------- Pantallas verticales / móviles: texto arriba, semicírculo abajo ---------- */
+@container (max-aspect-ratio: 1 / 1) {
+  .senati-semicircle { --R: calc(50cqw * var(--ring-scale)); --ring-margin: 0px; }
+  .semicircle-mask {
+    top: auto;
+    right: auto;
+    left: 50%;
+    bottom: 0;
+    width: calc(var(--R) * 2);
+    height: var(--R);
+    transform: translateX(-50%);
+  }
+  /* Aquí solo se ve la mitad superior del anillo: su centro queda en el borde inferior. */
+  .semicircle-ring { left: 50%; margin-left: calc(var(--S) / -2); top: auto; bottom: calc(var(--S) / -2); margin-top: 0; }
+  .semicircle-center { right: 0; bottom: var(--R); padding: 6cqw; align-items: center; text-align: center; }
+  .semicircle-controls { left: 50%; transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .semicircle-ring { animation: none; }
+}
