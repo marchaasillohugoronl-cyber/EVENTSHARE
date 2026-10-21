@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState, type CSSProperties } from 'react';
 import { esVideo } from '@/lib/video';
 import type { Post } from '@/lib/tipos';
 
-const COLS = 3;
+const COLS = 5;
 const MIN_CARDS = 7;        // mínimo de tarjetas por columna (evita huecos)
 const SECONDS_PER_CARD = 7; // menor = sube más rápido
 
