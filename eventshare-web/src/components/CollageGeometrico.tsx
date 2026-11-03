@@ -1,6 +1,10 @@
 'use client';
 
 import { useEffect, useId, useRef, useState, type CSSProperties } from 'react';
+import dynamic from 'next/dynamic';
+import type { Manipulation } from '@/lib/gestureInteraction';
+
+const ControlGestos = dynamic(() => import('./ControlGestos'), { ssr: false });
 
 type Photo = { url: string; label: string; href?: string };
 type Props = {
@@ -9,6 +13,8 @@ type Props = {
   fillFrame?: boolean;
   /** Tiempo entre cambios de fotos. 0 desactiva la rotación. */
   intervalMs?: number;
+  magicEnabled?: boolean;
+  onDisableMagic?: () => void;
 };
 
 // Misma composición y separaciones que collage-demo.html (740 × 1290).
@@ -23,11 +29,13 @@ const TILES = [
 ];
 const COLORS = [['#8aa39b', '#3f5a52'], ['#c9b58a', '#7b6a45'], ['#7f97ad', '#34495e'], ['#a7b27a', '#52602f']];
 
-export default function CollageGeometrico({ photos, interactive = false, fillFrame = false, intervalMs = 10000 }: Props) {
+export default function CollageGeometrico({ photos, interactive = false, fillFrame = false, intervalMs = 10000, magicEnabled = false, onDisableMagic }: Props) {
   const id = useId().replaceAll(':', '');
   const svgRef = useRef<SVGSVGElement>(null);
   const [landscape, setLandscape] = useState(false);
   const spread = landscape ? 2.6 : 1;
+  const [manipulation, setManipulation] = useState<Manipulation>({ transforms: {}, selected: null });
+  useEffect(() => { setManipulation({ transforms: {}, selected: null }); }, [magicEnabled, landscape]);
 
   useEffect(() => {
     const svg = svgRef.current;
@@ -54,17 +62,19 @@ export default function CollageGeometrico({ photos, interactive = false, fillFra
   }, []);
 
   useEffect(() => {
-    if (intervalMs <= 0 || paused || reducedMotion || available.length < 2) return;
+    if (intervalMs <= 0 || paused || magicEnabled || reducedMotion || available.length < 2) return;
     const timer = setInterval(() => {
       if (document.visibilityState === 'visible') setOffset(value => value + 1);
     }, intervalMs);
     return () => clearInterval(timer);
-  }, [intervalMs, paused, reducedMotion, available.length]);
+  }, [intervalMs, paused, magicEnabled, reducedMotion, available.length]);
+
+  const tiles = TILES.map(([x, y, width, height], i) => ({ id: i, x: x * spread, y, width: width * spread, height }));
 
   return (
-    <svg
+    <><svg
       ref={svgRef}
-      className={`geometric-collage${landscape ? ' geometric-collage--landscape' : ''}${fillFrame ? ' geometric-collage--fill' : ''}`}
+      className={`geometric-collage${landscape ? ' geometric-collage--landscape' : ''}${fillFrame ? ' geometric-collage--fill' : ''}${magicEnabled ? ' geometric-collage--magic' : ''}`}
       viewBox={landscape ? '0 108 1924 1020' : '0 140 740 960'}
       preserveAspectRatio="xMidYMid meet"
       role="group"
@@ -81,10 +91,12 @@ export default function CollageGeometrico({ photos, interactive = false, fillFra
           </linearGradient>
         ))}
       </defs>
-      {TILES.map(([x, y, width, height], i) => {
+      {TILES.map((tile, i) => ({ tile, i })).sort((a, b) => Number(a.i === manipulation.selected) - Number(b.i === manipulation.selected)).map(({ tile: [x, y, width, height], i }) => {
         const photo = available.length ? available[(i + offset) % available.length] : undefined;
-        const isLink = interactive && !!photo?.href;
+        const isLink = interactive && !magicEnabled && !!photo?.href;
         const box = { x: x * spread, y, width: width * spread, height };
+        const transform = magicEnabled ? manipulation.transforms[i] : undefined;
+        const cx = box.x + box.width / 2, cy = box.y + box.height / 2;
         const content = <>
           <rect {...box} fill={`url(#${id}-g${i % COLORS.length})`} />
           {photo && <image
@@ -102,6 +114,8 @@ export default function CollageGeometrico({ photos, interactive = false, fillFra
           />
         </>;
         return (
+          <g key={i} data-magic-tile={i} className={magicEnabled && manipulation.selected === i ? 'collage-tile--selected' : undefined}
+            transform={transform ? `translate(${transform.x} ${transform.y}) translate(${cx} ${cy}) scale(${transform.scale}) translate(${-cx} ${-cy})` : undefined}>
           <g
             key={`${i}-${offset}-${photo?.url ?? 'empty'}`}
             className={`collage-tile${isLink ? ' collage-tile--link' : ''}`}
@@ -118,9 +132,12 @@ export default function CollageGeometrico({ photos, interactive = false, fillFra
               <rect {...box} className="collage-focus-ring" fill="none" />
             </a> : <>{photo && <title>{photo.label}</title>}{content}</>}
           </g>
+          </g>
         );
       })}
 
     </svg>
+    {magicEnabled && onDisableMagic && <ControlGestos layoutKey={String(landscape)} svgRef={svgRef} tiles={available.length ? tiles : []} onChange={setManipulation} onDisable={onDisableMagic} />}
+    </>
   );
 }

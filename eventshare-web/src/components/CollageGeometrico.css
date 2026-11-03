@@ -39,6 +39,7 @@
 
 /* El SVG conserva sus proporciones y queda dentro del área segura. */
 .tv-slide:has(> .geometric-collage) {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -46,6 +47,31 @@
   padding: clamp(8px, 1.5vmin, 32px);
   overflow: hidden;
 }
+
+/* Only gesture mode suppresses entrance animations; the original layout stays intact. */
+.geometric-collage--magic .collage-tile { animation: none; }
+.collage-tile--selected .collage-photo-border { stroke: #67efff; stroke-width: 9; filter: drop-shadow(0 0 10px #00d9ff); }
+.magic-touch-toggle { cursor: pointer; color: #c9faff; border: 1px solid #51e4ff80; border-radius: 999px; padding: 10px 16px; background: #092638ee; box-shadow: 0 0 24px #00caff20; font-size: 14px; }
+.magic-touch-toggle:disabled { opacity: .45; cursor: default; }
+.tv-controls { display: flex; gap: 10px; align-items: center; }
+.gesture-overlay { position: absolute; inset: 0; z-index: 9; pointer-events: none; overflow: hidden; }
+.gesture-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.gesture-cursor-position { position: absolute; transform: translate(-50%, -50%); }
+.gesture-cursor { width: clamp(24px, 3vmin, 48px); aspect-ratio: 1; display: grid; place-items: center; border: 2px solid #affaff; border-radius: 50%; box-shadow: 0 0 14px #00d9ff, inset 0 0 12px #00d9ff; background: #00d9ff20; }
+.gesture-cursor span { width: 6px; height: 6px; background: white; border-radius: 50%; box-shadow: 0 0 12px cyan; }
+.gesture-cursor--paused { border-style: dashed; }
+.gesture-hud { position: absolute; left: clamp(12px, 2vw, 36px); top: 76px; width: min(380px, calc(100% - 24px)); padding: 16px 20px; color: #dafbff; background: #071b2bef; border: 1px solid #50e5ff55; border-radius: 18px; backdrop-filter: blur(12px); box-shadow: 0 12px 40px #0005; font-size: clamp(12px, 1.2vw, 17px); pointer-events: auto; }
+.gesture-hud-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.gesture-hud-heading strong { font-size: 1.1em; letter-spacing: .05em; }
+.gesture-hud button { text-decoration: underline; cursor: pointer; }
+.gesture-hud p { margin-top: 12px; line-height: 1.5; }
+.gesture-hud details { margin-top: 12px; font-size: .85em; }
+.gesture-hud summary { cursor: pointer; }
+.gesture-camera { display: flex; align-items: center; gap: 8px; font-size: .8em; color: #b5d0d7; }
+.gesture-camera span { width: 8px; height: 8px; border-radius: 50%; background: #8299a2; flex-shrink: 0; }
+.gesture-camera .is-active { background: #58f7c8; box-shadow: 0 0 10px #58f7c8; }
+.gesture-error { color: #ffd8a1; }
+.magic-touch-toggle:focus-visible, .gesture-hud button:focus-visible, .gesture-hud summary:focus-visible { outline: 3px solid #66efff; outline-offset: 4px; }
 
 .geometric-collage,
 .tv-slide:has(> .geometric-collage) {

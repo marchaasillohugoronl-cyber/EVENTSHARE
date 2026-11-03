@@ -52,6 +52,9 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
   const [loading, setLoading] = useState(true);
   const [fullscreenError, setFullscreenError] = useState('');
   const [controlsOpen, setControlsOpen] = useState(false);
+  const [magicEnabled, setMagicEnabled] = useState(false);
+  const [magicPhotos, setMagicPhotos] = useState<{ url: string; label: string }[]>([]);
+  useEffect(() => { if (unavailable) setMagicEnabled(false); }, [unavailable]);
 
   useEffect(() => {
     let active = true;
@@ -84,11 +87,13 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
   // Este contador solo lo usa el "collage" (cambia de foto cada 10 s).
   // Los demás diseños llevan su propio temporizador dentro de su componente.
   useEffect(() => {
+    if (magicEnabled) return;
     const timer = setInterval(() => setIndex(value => value + 1), 10000);
     return () => clearInterval(timer);
-  }, []);
+  }, [magicEnabled]);
 
   useEffect(() => {
+    if (magicEnabled) return;
     if (selectedView !== 'random') {
       setView(selectedView);
       return;
@@ -103,7 +108,7 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
     if (loading || unavailable || posts.length === 0) return;
     const timer = setInterval(cambiarVista, 12000);
     return () => clearInterval(timer);
-  }, [selectedView, view, loading, unavailable, posts.length]);
+  }, [selectedView, view, loading, unavailable, posts.length, magicEnabled]);
 
   async function fullscreen() {
     try {
@@ -131,7 +136,7 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
       </>;
     }
 
-    switch (view) {
+    switch (magicEnabled ? 'collage' : view) {
       case 'semicircle': return <SemicirculoSenati posts={posts} name={event.name} />;
       case 'tunnel': return <TunelRecuerdos posts={posts} name={event.name} />;
       case 'wheel': return <RuedaRecuerdos posts={posts} name={event.name} />;
@@ -141,10 +146,10 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
       // [PASO 4 - NUEVO DISEÑO] Agrega un case con el MISMO valor del PASO 2.
       // Ejemplo: case 'nuevo': return <MiNuevoDiseno posts={posts} name={event.name} />;
       default: return <div className="tv-slide">
-        {post.photoUrl && (esVideo(post.photoUrl)
+        {magicEnabled ? <CollageGeometrico photos={magicPhotos} fillFrame magicEnabled onDisableMagic={() => setMagicEnabled(false)} /> : post.photoUrl && (esVideo(post.photoUrl)
           ? <video key={post.id} src={post.photoUrl} autoPlay muted playsInline loop className="tv-media" />
           : <CollageGeometrico photos={photos} fillFrame />)}
-        {post.photoUrl && esVideo(post.photoUrl) && <div className="tv-caption">
+        {!magicEnabled && post.photoUrl && esVideo(post.photoUrl) && <div className="tv-caption">
           <span>{post.author.name}</span>
         </div>}
       </div>;
@@ -170,6 +175,10 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
       </div>
     </details>}
     <div className="tv-controls">
+      <button type="button" className="magic-touch-toggle" aria-pressed={magicEnabled} disabled={!magicEnabled && (unavailable || !photos.length)} onClick={() => {
+        if (!magicEnabled) setMagicPhotos(photos);
+        setMagicEnabled(value => !value); setControlsOpen(false);
+      }}>✦ {magicEnabled ? 'Desactivar Magic Touch' : 'Magic Touch'}</button>
       <button
         type="button"
         className="tv-controls-toggle"
@@ -184,11 +193,13 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
           <select
             className="mt-2 w-full rounded-lg border border-white/30 bg-slate-900 p-3 text-white"
             value={selectedView}
+            disabled={magicEnabled}
             onChange={e => setSelectedView(e.target.value as SeleccionVista)}
           >
             <option value={VISTA_ALEATORIA.value}>{VISTA_ALEATORIA.label}</option>
             {VISTAS.map(v => <option key={v.value} value={v.value}>{v.label}</option>)}
           </select>
+          {magicEnabled && <p className="mt-2 text-xs">Magic Touch mantiene el collage visible. Al desactivarlo vuelve tu presentación.</p>}
         </label>
         <button className="tv-fullscreen" onClick={fullscreen}>Activar / salir de pantalla completa</button>
         {fullscreenError && <p role="status" className="text-sm">{fullscreenError}</p>}

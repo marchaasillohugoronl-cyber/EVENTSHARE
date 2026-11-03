@@ -3,4 +3,10 @@
 node_modules
 .next
 *.tsbuildinfo
-scripts
+scripts/*
+!scripts/preparar-mediapipe.mjs
+.next-*
+public/magic-touch/vendor
+.aws
+.agents
+.codex
