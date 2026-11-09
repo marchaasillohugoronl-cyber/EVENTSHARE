@@ -1,5 +1,6 @@
 'use client';
 
+import { SharePhotoButton } from '@/components/CompartirFoto';
 import { esVideo } from '@/lib/video';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -94,7 +95,7 @@ export default function Feed({ event, mode = 'feed' }: { event: PublicEvent; mod
         <div className="rounded-2xl border border-dashed border-line px-6 py-14 text-center">
           <p className="font-serif text-2xl">Aún no hay publicaciones</p>
           {!closed && <><p className="mt-2 text-muted">Sé el primero en compartir un momento.</p>
-            <Link href={`/e/${event.code}/upload`} className="btn btn-primary mt-6">Subir foto</Link></>}
+            <SharePhotoButton className="btn btn-primary mt-6">Subir foto</SharePhotoButton></>}
         </div>
       )}
 

@@ -387,3 +387,16 @@ body {
   .upload-preview { animation: upload-preview-in 220ms ease-out; }
 }
 @keyframes upload-preview-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* Selección nativa y confirmación sin salir del evento. */
+.photo-camera-bubble { position: fixed; right: max(1.25rem, calc((100vw - 36rem) / 2 + 1.25rem)); bottom: calc(92px + env(safe-area-inset-bottom)); z-index: 41; display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: rgb(var(--brand-rgb)); color: white; border: 2px solid white; box-shadow: 0 6px 24px #15223830; }
+.photo-camera-bubble:focus-visible { outline: 3px solid currentColor; outline-offset: 4px; }
+.photo-composer { width: min(100%, 36rem); max-height: 92dvh; margin: auto auto 0; padding: 1.25rem; padding-bottom: max(1.25rem, env(safe-area-inset-bottom)); border: 0; border-radius: 24px 24px 0 0; background: #f5f8ff; color: #14284f; overflow-y: auto; }
+.photo-composer::backdrop { background: #0c172b99; backdrop-filter: blur(4px); }
+.photo-composer .upload-flow { padding-bottom: 0; }
+.photo-composer .upload-publish-bar { position: sticky; bottom: -1.25rem; left: auto; transform: none; width: auto; margin: 1rem -1.25rem -1.25rem; padding-bottom: max(1.25rem, env(safe-area-inset-bottom)); }
+.photo-composer .upload-preview > img { max-height: 48dvh; }
+.photo-picker-error { position: fixed; z-index: 42; bottom: calc(160px + env(safe-area-inset-bottom)); left: 1rem; right: 1rem; max-width: 34rem; margin-inline: auto; padding: 1rem; border: 1px solid #fecaca; border-radius: 16px; background: #fff; color: #991b1b; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.photo-picker-error button { min-width: 44px; min-height: 44px; }
+.wedding-event .photo-composer { background: #101110; color: #f6f0e3; }
+@media (min-width: 640px) { .photo-composer { margin: auto; border-radius: 24px; } }

@@ -1,5 +1,6 @@
 'use client';
 
+import { SharePhotoButton } from '@/components/CompartirFoto';
 import { esVideo } from '@/lib/video';
 import Link from 'next/link';
 import { Camera, Heart, Images } from 'lucide-react';
@@ -34,7 +35,7 @@ export default function PortadaMatrimonio({ event }: { event: PublicEvent }) {
         {date && <p className="wedding-date">{date}</p>}
         {event.description && <p className="wedding-description">{event.description}</p>}
         <div className="wedding-buttons">
-          {event.status === 'ACTIVE' && <Link href={`/e/${event.code}/upload`} className="btn wedding-primary"><Camera size={17} aria-hidden="true" />Subir foto</Link>}
+          {event.status === 'ACTIVE' && <SharePhotoButton className="btn wedding-primary"><Camera size={17} aria-hidden="true" />Subir foto</SharePhotoButton>}
           <Link href={`/e/${event.code}/photos`} className="btn wedding-secondary"><Images size={17} aria-hidden="true" />Ver álbum</Link>
         </div>
         <p className="wedding-footer font-serif">Gracias por ser parte de nuestra historia.</p>

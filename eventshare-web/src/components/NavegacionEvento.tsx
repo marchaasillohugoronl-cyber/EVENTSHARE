@@ -1,7 +1,8 @@
 'use client';
 
+import { SharePhotoButton } from '@/components/CompartirFoto';
 import Link from 'next/link';
-import { Camera, Images, LayoutGrid, type LucideIcon } from 'lucide-react';
+import { Images, LayoutGrid, type LucideIcon } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export default function EventNav({ code, canPost }: { code: string; canPost: boolean }) {
@@ -20,7 +21,7 @@ export default function EventNav({ code, canPost }: { code: string; canPost: boo
       <div className="mx-auto flex max-w-xl items-center gap-3 px-5 py-2">
         {item(`/e/${code}`, 'Muro', path === `/e/${code}`, LayoutGrid)}
         {canPost && (
-          <Link href={`/e/${code}/upload`} className="btn btn-primary nav-upload" aria-current={path === `/e/${code}/upload` ? 'page' : undefined}><Camera size={20} aria-hidden="true" />Compartir</Link>
+          <SharePhotoButton className="btn btn-primary nav-upload"><Images size={20} aria-hidden="true" />Compartir</SharePhotoButton>
         )}
         {item(`/e/${code}/photos`, 'Álbum', path === `/e/${code}/photos`, Images)}
       </div>

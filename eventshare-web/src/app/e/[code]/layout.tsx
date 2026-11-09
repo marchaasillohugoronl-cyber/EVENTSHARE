@@ -1,3 +1,5 @@
+import SharePhotoProvider from '@/components/CompartirFoto';
+import type { PublicEvent } from '@/lib/tipos';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import EventNav from '@/components/NavegacionEvento';
@@ -29,8 +31,10 @@ export default async function EventLayout({ children, params }: Props) {
 
   return (
     <div style={themeVars(ev.theme === 'SENATI_TEC' ? '#0756A6' : esMatrimonio(ev.name) ? '#D8BB76' : ev.primaryColor) as React.CSSProperties} className={`min-h-screen pb-36 ${ev.theme === 'SENATI_TEC' ? 'senati-event' : esMatrimonio(ev.name) ? 'wedding-event' : ''}`}>
+      <SharePhotoProvider event={JSON.parse(JSON.stringify(ev)) as PublicEvent}>
       <div className={`mx-auto ${ev.theme === 'SENATI_TEC' ? 'max-w-6xl' : 'max-w-xl'}`}>{children}</div>
       <EventNav code={ev.code} canPost={ev.status === 'ACTIVE'} />
+      </SharePhotoProvider>
     </div>
   );
 }

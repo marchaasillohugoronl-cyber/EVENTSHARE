@@ -1,3 +1,4 @@
+import { SharePhotoButton } from '@/components/CompartirFoto';
 import Link from 'next/link';
 import { ArrowUpRight, CalendarDays, Camera, Images } from 'lucide-react';
 import { notFound } from 'next/navigation';
@@ -35,7 +36,7 @@ export default async function EventPage({ params }: { params: Promise<{ code: st
         {event.description && <p className="max-w-prose whitespace-pre-line font-serif text-lg leading-relaxed">{event.description}</p>}
         {event.status === 'ACTIVE' ? (
           <div className="event-actions mt-5 grid grid-cols-2 gap-3">
-            <Link href={`/e/${event.code}/upload`} className="btn btn-primary"><Camera size={18} aria-hidden="true" />Subir foto</Link>
+            <SharePhotoButton className="btn btn-primary"><Camera size={18} aria-hidden="true" />Subir foto</SharePhotoButton>
             <Link href={`/e/${event.code}/photos`} className="btn btn-ghost"><Images size={18} aria-hidden="true" />Ver álbum</Link>
           </div>
         ) : (

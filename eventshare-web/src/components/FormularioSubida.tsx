@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Camera, Images, Upload, Check } from 'lucide-react';
+import { Upload, Check, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { api, errorMessage } from '@/lib/api';
@@ -11,18 +11,18 @@ import { useSession } from './ProveedorSesion';
 
 type Presign = { uploadUrl: string; key: string; fields: Record<string, string> };
 
-export default function UploadForm({ event }: { event: PublicEvent }) {
+export default function UploadForm({ event, initialFile, onClose, onBusyChange, onIdentityChange }: { event: PublicEvent; initialFile: File; onClose?: () => void; onBusyChange?: (busy: boolean) => void; onIdentityChange?: (open: boolean) => void }) {
   const router = useRouter();
   const { ensureIdentity } = useSession();
-  const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>(initialFile);
   const [preview, setPreview] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [requiresApproval, setRequiresApproval] = useState(false);
   const [phase, setPhase] = useState('');
   const publishing = useRef(false);
-  const cameraRef = useRef<HTMLInputElement>(null);
   const galleryRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -49,11 +49,19 @@ export default function UploadForm({ event }: { event: PublicEvent }) {
     if (publishing.current) return;
     publishing.current = true;
     setBusy(true);
+    onBusyChange?.(true);
     setError(null);
     setProgress(0);
     try {
       setPhase('Preparando tu publicación…');
-      if (!(await ensureIdentity(event.code))) return;
+      let identified = false;
+      onIdentityChange?.(true);
+      try {
+        identified = await ensureIdentity(event.code);
+      } finally {
+        onIdentityChange?.(false);
+      }
+      if (!identified) return;
       let key: string | undefined;
       if (file) {
         const blob = await prepareImage(file);
@@ -66,52 +74,47 @@ export default function UploadForm({ event }: { event: PublicEvent }) {
       const r = await api<{ post: Post; requiresApproval: boolean }>(`/events/${event.id}/posts`, {
         method: 'POST', json: { photoKey: key },
       });
+      setRequiresApproval(r.requiresApproval);
       if (r.requiresApproval) setPending(true);
-      else router.push(`/e/${event.code}`);
+      else {
+        setPending(true);
+        router.push(`/e/${event.code}`);
+        router.refresh();
+      }
     } catch (e) {
       setError(errorMessage(e));
     } finally {
       publishing.current = false;
       setBusy(false);
+      onBusyChange?.(false);
     }
   }
 
   if (pending) {
     return (
       <div className="py-16 text-center">
-        <p className="font-serif text-3xl">Recibido · Pendiente de aprobación</p>
-        <p className="mx-auto mt-3 max-w-xs text-muted">Tu publicación se guardó correctamente. Aparecerá en el muro y en la TV cuando el anfitrión la apruebe. No necesitas volver a subirla.</p>
-        <Link href={`/e/${event.code}`} className="btn btn-primary mt-8">Volver al muro</Link>
+        <p className="font-serif text-3xl">{requiresApproval ? 'Recibido · Pendiente de aprobación' : '¡Foto publicada!'}</p>
+        <p className="mx-auto mt-3 max-w-xs text-muted">{requiresApproval ? 'Tu publicación se guardó correctamente. Aparecerá en el muro y en la TV cuando el anfitrión la apruebe. No necesitas volver a subirla.' : 'Tu momento ya está en el álbum del evento.'}</p>
+        <Link href={`/e/${event.code}`} onClick={onClose} className="btn btn-primary mt-8">Volver al muro</Link>
       </div>
     );
   }
 
   return (
     <div className="upload-flow">
-      <header>
-        <h1 className="font-serif text-3xl">Comparte un momento</h1>
-        <p className="mt-2 text-sm text-muted">Toma una foto o elige una de tu galería.</p>
-      </header>
-      <input ref={cameraRef} type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden onChange={onPick} />
+      <header className="flex items-start justify-between gap-3"><div>
+        <h1 className="font-serif text-3xl">Publicar foto</h1>
+        <p className="mt-2 text-sm text-muted">Revisa tu foto y comparte el momento.</p>
+      </div>{onClose && <button type="button" className="btn btn-ghost" aria-label="Cerrar vista previa" disabled={busy} onClick={onClose}><X size={20} /></button>}</header>
       <input ref={galleryRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={onPick} />
 
-      {preview && file ? (
+      {preview && file && (
         <section className="upload-preview" aria-label="Vista previa de tu publicación">
           <div className="upload-preview-heading"><span><Check size={16} aria-hidden="true" />Tu momento está listo</span>
-            <button type="button" onClick={() => setFile(null)} disabled={busy}>Cambiar</button>
+            <button type="button" onClick={() => galleryRef.current?.click()} disabled={busy}>Cambiar</button>
           </div>
           <img src={preview} alt="Vista previa de tu foto" />
         </section>
-      ) : (
-        <div className="upload-options">
-          <button type="button" className="btn btn-primary" onClick={() => cameraRef.current?.click()} disabled={busy}>
-            <Camera aria-hidden="true" />Tomar foto
-          </button>
-          <button type="button" className="btn btn-ghost" onClick={() => galleryRef.current?.click()} disabled={busy}>
-            <Images aria-hidden="true" />Elegir de la galería
-          </button>
-          <p className="text-center text-xs text-muted upload-gallery">Fotos JPG, PNG o WebP.</p>
-        </div>
       )}
 
       <div className="upload-publish-bar">

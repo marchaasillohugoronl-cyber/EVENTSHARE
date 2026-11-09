@@ -1,5 +1,6 @@
 'use client';
 
+import { SharePhotoButton } from '@/components/CompartirFoto';
 import Link from 'next/link';
 import CollageGeometrico from './CollageGeometrico';
 import RobotSenati from './RobotSenati';
@@ -40,7 +41,7 @@ export default function PortadaSenati({ event }: { event: PublicEvent }) {
         <span className="senati-edition">TECNOLOGÍA<br />QUE NOS UNE</span>
       </div>
       <section className="senati-welcome" aria-label="Bienvenida a la comunidad SENATI">
-        <div className="senati-welcome-copy"><p className="senati-kicker">EL FUTURO LO CREAMOS JUNTOS</p><h2>Tu talento.<br />Tus momentos.<br /><span>Nuestra comunidad.</span></h2><p>Cada idea tiene una historia. Comparte la tuya y forma parte de los recuerdos de este evento.</p><div className="senati-actions">{event.status === 'ACTIVE' ? <Link href={`/e/${event.code}/upload`} className="btn btn-primary">Compartir un momento ↗</Link> : <Link href={`/e/${event.code}/photos`} className="btn btn-primary">Explorar los recuerdos ↗</Link>}</div></div>
+        <div className="senati-welcome-copy"><p className="senati-kicker">EL FUTURO LO CREAMOS JUNTOS</p><h2>Tu talento.<br />Tus momentos.<br /><span>Nuestra comunidad.</span></h2><p>Cada idea tiene una historia. Comparte la tuya y forma parte de los recuerdos de este evento.</p><div className="senati-actions">{event.status === 'ACTIVE' ? <SharePhotoButton className="btn btn-primary">Compartir un momento ↗</SharePhotoButton> : <Link href={`/e/${event.code}/photos`} className="btn btn-primary">Explorar los recuerdos ↗</Link>}</div></div>
         <RobotSenati />
       </section>
       <div className="senati-collage">
@@ -53,7 +54,7 @@ export default function PortadaSenati({ event }: { event: PublicEvent }) {
           {formatDate(event.eventDate) && <p>{formatDate(event.eventDate)}</p>}
           {event.description && <p className="whitespace-pre-line">{event.description}</p>}
           <div className="senati-actions">
-            {event.status === 'ACTIVE' ? <Link href={`/e/${event.code}/upload`} className="btn btn-primary">Compartir una foto ↗</Link> : <p>El evento está cerrado. Disfruta los recuerdos del álbum.</p>}
+            {event.status === 'ACTIVE' ? <SharePhotoButton className="btn btn-primary">Compartir una foto ↗</SharePhotoButton> : <p>El evento está cerrado. Disfruta los recuerdos del álbum.</p>}
             <Link href={`/e/${event.code}/photos`} className="btn btn-ghost">Ver álbum</Link>
           </div><p className="senati-note">Comparte tus mejores fotos del evento.</p>
           {error && <p role="status" className="text-sm">No se pudo actualizar el collage. Se reintentará automáticamente.</p>}
