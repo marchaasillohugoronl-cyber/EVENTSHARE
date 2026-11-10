@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Upload, Check, X } from 'lucide-react';
+import { Send, CircleCheck, ImagePlus, ImageUp, ShieldCheck, Clock3, CircleAlert, LoaderCircle, ArrowLeft, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { api, errorMessage } from '@/lib/api';
@@ -92,42 +92,43 @@ export default function UploadForm({ event, initialFile, onClose, onBusyChange, 
 
   if (pending) {
     return (
-      <div className="py-16 text-center">
-        <p className="font-serif text-3xl">{requiresApproval ? 'Recibido · Pendiente de aprobación' : '¡Foto publicada!'}</p>
+      <div className="upload-success">
+        <span className="upload-success-icon">{requiresApproval ? <Clock3 size={30} strokeWidth={1.6} aria-hidden="true" /> : <CircleCheck size={30} strokeWidth={1.6} aria-hidden="true" />}</span>
+        <p className="upload-success-title">{requiresApproval ? 'Recibido · Pendiente de aprobación' : '¡Foto publicada!'}</p>
         <p className="mx-auto mt-3 max-w-xs text-muted">{requiresApproval ? 'Tu publicación se guardó correctamente. Aparecerá en el muro y en la TV cuando el anfitrión la apruebe. No necesitas volver a subirla.' : 'Tu momento ya está en el álbum del evento.'}</p>
-        <Link href={`/e/${event.code}`} onClick={onClose} className="btn btn-primary mt-8">Volver al muro</Link>
+        <Link href={`/e/${event.code}`} onClick={onClose} className="btn btn-primary mt-8"><ArrowLeft size={18} strokeWidth={1.7} aria-hidden="true" />Volver al muro</Link>
       </div>
     );
   }
 
   return (
     <div className="upload-flow">
-      <header className="flex items-start justify-between gap-3"><div>
-        <h1 className="font-serif text-3xl">Publicar foto</h1>
-        <p className="mt-2 text-sm text-muted">Revisa tu foto y comparte el momento.</p>
-      </div>{onClose && <button type="button" className="btn btn-ghost" aria-label="Cerrar vista previa" disabled={busy} onClick={onClose}><X size={20} /></button>}</header>
+      <header className="upload-header"><div className="upload-heading"><span className="upload-heading-icon"><ImagePlus size={23} strokeWidth={1.7} aria-hidden="true" /></span><div>
+        <h1>Publicar foto</h1>
+        <p>Revisa tu foto y comparte el momento.</p>
+      </div></div>{onClose && <button type="button" className="upload-close" aria-label="Cerrar vista previa" disabled={busy} onClick={onClose}><X size={20} strokeWidth={1.7} aria-hidden="true" /></button>}</header>
       <input ref={galleryRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={onPick} />
 
       {preview && file && (
         <section className="upload-preview" aria-label="Vista previa de tu publicación">
-          <div className="upload-preview-heading"><span><Check size={16} aria-hidden="true" />Tu momento está listo</span>
-            <button type="button" onClick={() => galleryRef.current?.click()} disabled={busy}>Cambiar</button>
+          <div className="upload-preview-heading"><span><CircleCheck size={16} strokeWidth={1.7} aria-hidden="true" />Tu momento está listo</span>
+            <button type="button" onClick={() => galleryRef.current?.click()} disabled={busy}><ImageUp size={17} strokeWidth={1.7} aria-hidden="true" />Cambiar</button>
           </div>
           <img src={preview} alt="Vista previa de tu foto" />
         </section>
       )}
 
       <div className="upload-publish-bar">
-        {error && <p role="alert" className="mb-2 text-sm text-red-700">{error}</p>}
+        {error && <p role="alert" className="upload-error"><CircleAlert size={18} strokeWidth={1.7} aria-hidden="true" />{error}</p>}
         {busy && <div className="mb-3" role="status" aria-live="polite">
           <progress className="upload-progress" value={progress} max={100} aria-label="Progreso de subida" />
           <p className="mt-1 text-sm">{phase}{phase.startsWith('Subiendo') ? ` ${progress}%` : ''}</p>
         </div>}
         <button type="button" className="btn btn-primary w-full" onClick={publish} disabled={busy || !file}>
-          <Upload size={20} aria-hidden="true" />{busy ? 'Publicando…' : 'Publicar momento'}
+          {busy ? <LoaderCircle className="upload-spinner" size={19} strokeWidth={1.7} aria-hidden="true" /> : <Send size={19} strokeWidth={1.7} aria-hidden="true" />}{busy ? 'Publicando…' : 'Publicar momento'}
         </button>
         {!file && !busy && <p className="mt-2 text-center text-xs text-muted">Selecciona una foto para continuar.</p>}
-        {event.moderationEnabled && <p className="mt-2 text-center text-xs text-muted">Tu publicación aparecerá después de la revisión del anfitrión.</p>}
+        {event.moderationEnabled && <p className="upload-moderation"><ShieldCheck size={17} strokeWidth={1.7} aria-hidden="true" /><span>Tu publicación aparecerá después de la revisión del anfitrión.</span></p>}
       </div>
     </div>
   );
