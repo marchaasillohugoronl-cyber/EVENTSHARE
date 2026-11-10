@@ -77,7 +77,14 @@ try {
     for(let i=0;i<7;i++){window.__time+=100;window.__workers.at(-1).onmessage({data:{type:'result',timestamp:window.__time,hands:[shape,...(window.__second?[window.__second]:[])]}});await new Promise(r=>setTimeout(r,20));}
   }`);
   const center = await evaluate(`(() => {const r=document.querySelector('[data-magic-tile="9"]').getBoundingClientRect();return {x:(r.x+r.width/2)/innerWidth,y:(r.y+r.height/2)/innerHeight};})()`);
+  assert.match(await evaluate(`document.querySelector('.gesture-guide').textContent`), /Paso 1 de 3/);
+  await evaluate(`window.__inject('draw',${center.x},${center.y})`);
+  assert.equal(await evaluate(`document.querySelector('.collage-tile--hovered')?.getAttribute('data-magic-tile')`), '9', 'resalta antes del pellizco');
+  assert.match(await evaluate(`document.querySelector('.gesture-guide').textContent`), /Paso 3 de 3/);
   await evaluate(`window.__inject('pinch',${center.x},${center.y})`);
+  assert.match(await evaluate(`document.querySelector('.gesture-guide').textContent`), /Ya sabes mover fotos/);
+  await evaluate(`document.querySelector('.gesture-guide-heading button').click()`);
+  assert.equal(await evaluate(`!!document.querySelector('.gesture-guide')`), false, 'guía se puede ocultar');
   assert.equal(await evaluate(`!!document.querySelector('.collage-tile--selected')`), true, 'pellizco selecciona');
   const before = await evaluate(`document.querySelector('.collage-tile--selected').getAttribute('transform')`);
   await evaluate(`window.__inject('pinch',${center.x + .06},${center.y + .04})`);
@@ -94,7 +101,13 @@ try {
   assert.ok(await evaluate(pixelCount) > 0, 'trazos dibujados');
   await evaluate(`window.__inject('palm',.55,.45)`);
   assert.match(await evaluate(`document.querySelector('.gesture-hud').textContent`), /En pausa/);
-  assert.equal(await evaluate(pixelCount), 0, 'palma borra trazos');
+  assert.ok(await evaluate(pixelCount) > 0, 'pausar conserva los trazos');
+  assert.equal(await evaluate(`!!document.querySelector('.collage-tile--hovered')`), false, 'pausa elimina preselección');
+  const positions = await evaluate(`Array.from(document.querySelectorAll('[data-magic-tile]'), tile => tile.getAttribute('transform'))`);
+  await evaluate(`Array.from(document.querySelectorAll('.gesture-actions button')).find(b=>b.textContent==='Borrar dibujo').click()`);
+  await until(async () => await evaluate(pixelCount) === 0, 'botón borra trazos');
+  assert.deepEqual(await evaluate(`Array.from(document.querySelectorAll('[data-magic-tile]'), tile => tile.getAttribute('transform'))`), positions, 'borrar conserva posiciones');
+  assert.match(await evaluate(`document.querySelector('.gesture-hud').textContent`), /En pausa/);
   await evaluate(`window.__inject('fist',.55,.45)`);
   assert.match(await evaluate(`document.querySelector('.gesture-hud').textContent`), /reanudada/);
   await cdp('Page.captureScreenshot', { format: 'png' }).then(r => writeFileSync('/tmp/eventshare-magic-touch.png', Buffer.from(r.data, 'base64')));
@@ -123,7 +136,7 @@ try {
   await evaluate(`document.querySelector('.magic-touch-toggle').click()`);
   await until(() => evaluate(`window.__streams.every(s=>s.getTracks().every(t=>t.readyState==='ended'))`), 'stream tardío detenido tras desactivar');
   assert.deepEqual(errors, [], 'sin excepciones de navegador');
-  console.log('OK: permisos, worker/WASM/modelo reales, selección, arrastre, dibujo, pausa/borrado, reanudación y liberación de cámara.');
+  console.log('OK: permisos, worker/WASM/modelo reales, guía, preselección, arrastre, dibujo, pausa sin borrado, borrado explícito, reanudación y liberación de cámara.');
   console.log('Captura: /tmp/eventshare-magic-touch.png');
 } finally {
   ws?.close();

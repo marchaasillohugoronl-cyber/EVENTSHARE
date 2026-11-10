@@ -95,7 +95,7 @@ export default function Feed({ event, mode = 'feed' }: { event: PublicEvent; mod
         <div className="rounded-2xl border border-dashed border-line px-6 py-14 text-center">
           <p className="font-serif text-2xl">Aún no hay publicaciones</p>
           {!closed && <><p className="mt-2 text-muted">Sé el primero en compartir un momento.</p>
-            <SharePhotoButton className="btn btn-primary mt-6">Subir foto</SharePhotoButton></>}
+            <SharePhotoButton className="btn btn-primary mt-6">Compartir foto</SharePhotoButton></>}
         </div>
       )}
 

@@ -34,8 +34,8 @@ export default function CollageGeometrico({ photos, interactive = false, fillFra
   const svgRef = useRef<SVGSVGElement>(null);
   const [landscape, setLandscape] = useState(false);
   const spread = landscape ? 2.6 : 1;
-  const [manipulation, setManipulation] = useState<Manipulation>({ transforms: {}, selected: null });
-  useEffect(() => { setManipulation({ transforms: {}, selected: null }); }, [magicEnabled, landscape]);
+  const [manipulation, setManipulation] = useState<Manipulation>({ transforms: {}, selected: null, hovered: null });
+  useEffect(() => { setManipulation({ transforms: {}, selected: null, hovered: null }); }, [magicEnabled, landscape]);
 
   useEffect(() => {
     const svg = svgRef.current;
@@ -114,7 +114,7 @@ export default function CollageGeometrico({ photos, interactive = false, fillFra
           />
         </>;
         return (
-          <g key={i} data-magic-tile={i} className={magicEnabled && manipulation.selected === i ? 'collage-tile--selected' : undefined}
+          <g key={i} data-magic-tile={i} className={magicEnabled ? manipulation.selected === i ? 'collage-tile--selected' : manipulation.hovered === i ? 'collage-tile--hovered' : undefined : undefined}
             transform={transform ? `translate(${transform.x} ${transform.y}) translate(${cx} ${cy}) scale(${transform.scale}) translate(${-cx} ${-cy})` : undefined}>
           <g
             key={`${i}-${offset}-${photo?.url ?? 'empty'}`}

@@ -302,3 +302,17 @@
 .tv-slide:has(> .geometric-collage):fullscreen {
   cursor: none;
 }
+
+/* La preselección se distingue de una foto agarrada por forma y color. */
+.collage-tile--hovered .collage-photo-border { stroke: #ffe9a8; stroke-width: 8; stroke-dasharray: 14 9; filter: drop-shadow(0 0 7px #ffcf5e); }
+.gesture-hud { max-height: calc(100% - 90px); overflow-y: auto; }
+.gesture-hud button { min-height: 44px; padding: 6px 8px; }
+.gesture-guide { margin-top: 12px; padding-top: 12px; border-top: 1px solid #50e5ff44; }
+.gesture-guide-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.gesture-guide ol { display: grid; gap: 10px; margin-top: 10px; list-style: none; }
+.gesture-guide li { display: flex; align-items: center; gap: 10px; color: #b5d0d7; }
+.gesture-guide li > span { display: grid; place-items: center; flex-shrink: 0; width: 26px; height: 26px; border: 1px solid currentColor; border-radius: 50%; }
+.gesture-guide li[aria-current='step'] { color: #ffe9a8; font-weight: 600; }
+.gesture-guide li.is-complete { color: #85e8c5; }
+.gesture-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.gesture-actions button { border: 1px solid #50e5ff55; border-radius: 10px; padding-inline: 12px; text-decoration: none; }

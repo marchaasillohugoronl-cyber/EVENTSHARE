@@ -1,7 +1,7 @@
 import { clamp, nearestTile, type Gesture, type HandFrame, type Point, type TileBox, type TileTransform } from './gestureRecognition';
 
-export type Manipulation = { transforms: Record<number, TileTransform>; selected: number | null };
-export type InteractionResult = Manipulation & { cursor: Point | null; drawing: boolean; clear: boolean; label: string; paused: boolean };
+export type Manipulation = { transforms: Record<number, TileTransform>; selected: number | null; hovered: number | null };
+export type InteractionResult = Manipulation & { cursor: Point | null; drawing: boolean; label: string; paused: boolean };
 export class GestureInteraction {
   private primary: number | null = null;
   private lastGesture: Gesture = 'none';
@@ -16,18 +16,20 @@ export class GestureInteraction {
       this.grip = null; this.zoom = null; this.lastGesture = 'none';
       hand = frame.hands[0]; this.primary = hand?.id ?? null;
     }
-    let clear = false, drawing = false;
+    let drawing = false;
+    let hovered: number | null = null;
     let label = this.paused ? 'En pausa · cierra el puño para continuar' : 'Muestra tu mano a la cámara';
     if (hand) {
       const point = toSvg(hand.point);
       if (hand.gesture === 'palm' && this.lastGesture !== 'palm') {
-        this.paused = true; clear = true; this.grip = null; this.zoom = null;
+        this.paused = true; this.grip = null; this.zoom = null;
       } else if (hand.gesture === 'fist') this.paused = false;
       if (this.paused) label = 'En pausa · cierra el puño para continuar';
       else {
+        hovered = nearestTile(point, tiles, this.transforms, bounds.width * .07);
         if (hand.gesture === 'pinch') {
           if (!this.grip && this.lastGesture !== 'pinch') {
-            const tile = nearestTile(point, tiles, this.transforms, bounds.width * .07);
+            const tile = hovered;
             if (tile !== null) this.grip = { tile, start: point, transform: this.transforms[tile] ?? { x: 0, y: 0, scale: 1 } };
           }
           if (this.grip) {
@@ -53,11 +55,20 @@ export class GestureInteraction {
         } else {
           this.grip = null; this.zoom = null;
           drawing = hand.gesture === 'draw';
-          label = drawing ? 'Dibujando' : hand.gesture === 'fist' ? 'Interacción reanudada' : 'Índice: dibujar · pellizco: mover';
+          label = drawing ? 'Dibujando' : hand.gesture === 'fist' ? 'Interacción reanudada' : hovered !== null ? 'Foto lista · junta pulgar e índice para tomarla' : 'Acerca el cursor a una fotografía';
         }
       }
       this.lastGesture = hand.gesture;
     }
-    return { transforms: this.transforms, selected: this.grip?.tile ?? null, cursor: hand?.point ?? null, drawing, clear, label, paused: this.paused };
+    return { transforms: this.transforms, selected: this.grip?.tile ?? null, cursor: hand?.point ?? null, drawing, hovered: this.grip ? null : hovered, label, paused: this.paused };
   }
+}
+
+/** El aprendizaje avanza con acciones reales, sin temporizadores. */
+export type GuideStep = 0 | 1 | 2 | 3;
+export function advanceGuide(step: GuideStep, state: InteractionResult): GuideStep {
+  if (step === 3 || !state.cursor || state.paused) return step;
+  if (state.selected !== null) return 3;
+  if (state.hovered !== null) return Math.max(step, 2) as GuideStep;
+  return Math.max(step, 1) as GuideStep;
 }

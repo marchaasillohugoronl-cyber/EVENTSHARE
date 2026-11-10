@@ -1,0 +1,30 @@
+.photo-letter { position: absolute; inset: 0; z-index: 12; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; place-items: center; gap: 16px; padding: clamp(70px, 9vh, 100px) 24px 40px; overflow: hidden; background: radial-gradient(ellipse at 50% 40%, #294754f5, #080f1bf7 75%); opacity: 0; pointer-events: none; }
+.photo-letter--ready { pointer-events: auto; animation: letter-spotlight 10.5s both; }
+.photo-letter-glow { position: absolute; width: min(80vw, 900px); aspect-ratio: 1; border-radius: 50%; background: radial-gradient(circle, #f4d49525, transparent 65%); pointer-events: none; }
+.photo-letter-intro { display: flex; align-items: center; gap: 12px; color: #ffe3a4; font-size: clamp(16px, 2vw, 28px); text-align: center; z-index: 1; }
+.photo-letter-scene { position: relative; width: min(80vw, 900px); height: 100%; min-height: 0; display: grid; place-items: center; perspective: 1400px; }
+.photo-letter-envelope { position: absolute; width: min(72vw, 540px); aspect-ratio: 1.55; filter: drop-shadow(0 28px 35px #0006); transform-style: preserve-3d; }
+.photo-letter-back { position: absolute; inset: 0; border-radius: 12px; background: #cbb88e; }
+.photo-letter-front { position: absolute; inset: 0; z-index: 3; background: linear-gradient(140deg, #fff3d6, #dfc795); clip-path: polygon(0 0, 50% 53%, 100% 0, 100% 100%, 0 100%); border-radius: 12px; }
+.photo-letter-flap { position: absolute; inset: 0; z-index: 4; background: linear-gradient(#fff3d8, #e2c994); clip-path: polygon(0 0, 100% 0, 50% 55%); transform-origin: center top; backface-visibility: visible; }
+.photo-letter-seal { position: absolute; z-index: 5; top: 42%; left: 44%; width: 12%; aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%; color: #fff2c3; background: #a46c39; border: 2px solid #e5ba70; box-shadow: 0 4px 8px #0003; font-size: clamp(20px, 3vw, 36px); }
+.photo-letter-card { position: relative; z-index: 2; width: 100%; height: 100%; min-height: 0; padding: clamp(8px, 1.3vw, 16px); display: flex; flex-direction: column; gap: 12px; background: #fffcf4; border-radius: 10px; box-shadow: 0 24px 90px #0008; opacity: 0; }
+.photo-letter-card img { display: block; flex: 1; min-height: 0; width: 100%; object-fit: contain; background: #eee9de; border-radius: 4px; }
+.photo-letter-card figcaption { flex-shrink: 0; display: flex; flex-direction: column; text-align: center; color: #1b3040; }
+.photo-letter-card figcaption span { font-size: clamp(10px, 1vw, 14px); text-transform: uppercase; letter-spacing: .16em; color: #786744; }
+.photo-letter-card figcaption strong { font-family: var(--font-serif), Georgia, serif; font-size: clamp(20px, 2.4vw, 34px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.photo-letter-footer { z-index: 1; color: #d9e3e5; font-size: clamp(12px, 1.4vw, 19px); text-align: center; }
+.photo-letter-close { position: absolute; top: 20px; left: 20px; width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid #ffffff60; border-radius: 50%; color: white; background: #ffffff10; }
+.photo-letter-close:focus-visible { outline: 3px solid #ffe3a4; outline-offset: 4px; }
+.photo-letter--ready .photo-letter-envelope { animation: letter-envelope 4s both; }
+.photo-letter--ready .photo-letter-flap { animation: letter-open 1s .9s both; }
+.photo-letter--ready .photo-letter-seal { animation: letter-unseal .45s .8s both; }
+.photo-letter--ready .photo-letter-card { animation: letter-reveal 2s 1.65s both; }
+@keyframes letter-spotlight { 0% { opacity: 0; } 6%, 92% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes letter-envelope { 0% { opacity: 0; transform: translateY(100px) rotate(-8deg) scale(.7); } 20%, 65% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(160px) scale(.85); } }
+@keyframes letter-open { from { transform: rotateX(0); } to { transform: rotateX(180deg); } }
+@keyframes letter-unseal { to { opacity: 0; transform: scale(1.3); } }
+@keyframes letter-reveal { 0% { opacity: 0; transform: translateY(70px) scale(.28) rotate(-4deg); } 30% { opacity: 1; transform: translateY(-65px) scale(.5) rotate(2deg); } 100% { opacity: 1; transform: none; } }
+@media (max-width: 600px) { .photo-letter { padding: 85px 16px 28px; } .photo-letter-scene { width: 92vw; max-height: 68dvh; } }
+@media (max-height: 500px) { .photo-letter { padding: 60px 18px 16px; gap: 8px; } .photo-letter-card { gap: 4px; } .photo-letter-card figcaption span { display: none; } }
+@media (prefers-reduced-motion: reduce) { .photo-letter--ready { animation: none; opacity: 1; } .photo-letter-envelope { display: none; } .photo-letter--ready .photo-letter-card { animation: none; opacity: 1; transform: none; } }

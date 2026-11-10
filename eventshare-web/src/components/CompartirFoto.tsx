@@ -1,7 +1,6 @@
 'use client';
 
 import { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { Camera } from 'lucide-react';
 import type { PublicEvent } from '@/lib/tipos';
 import UploadForm from './FormularioSubida';
 
@@ -14,7 +13,6 @@ export function SharePhotoButton({ children, className }: { children: React.Reac
 
 export default function SharePhotoProvider({ event, children }: { event: PublicEvent; children: React.ReactNode }) {
   const gallery = useRef<HTMLInputElement>(null);
-  const camera = useRef<HTMLInputElement>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [error, setError] = useState('');
@@ -50,8 +48,6 @@ export default function SharePhotoProvider({ event, children }: { event: PublicE
     {children}
     {event.status === 'ACTIVE' && <>
       <input ref={gallery} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={pick} />
-      <input ref={camera} type="file" accept="image/*" capture="environment" hidden onChange={pick} />
-      <button type="button" className="photo-camera-bubble" aria-label="Tomar foto" title="Tomar foto" onClick={() => camera.current?.click()}><Camera size={26} aria-hidden="true" /></button>
       {error && <div className="photo-picker-error" role="alert">{error}<button type="button" onClick={() => setError('')} aria-label="Cerrar aviso">×</button></div>}
       <dialog ref={dialog} className="photo-composer" aria-label="Publicar foto" onCancel={(e) => { e.preventDefault(); close(); }}>
         {file && <UploadForm event={event} initialFile={file} onClose={close} onBusyChange={setBusy} onIdentityChange={(open) => {

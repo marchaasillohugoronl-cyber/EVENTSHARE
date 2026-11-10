@@ -389,8 +389,6 @@ body {
 @keyframes upload-preview-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 /* Selección nativa y confirmación sin salir del evento. */
-.photo-camera-bubble { position: fixed; right: max(1.25rem, calc((100vw - 36rem) / 2 + 1.25rem)); bottom: calc(92px + env(safe-area-inset-bottom)); z-index: 41; display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: rgb(var(--brand-rgb)); color: white; border: 2px solid white; box-shadow: 0 6px 24px #15223830; }
-.photo-camera-bubble:focus-visible { outline: 3px solid currentColor; outline-offset: 4px; }
 .photo-composer { width: min(100%, 36rem); max-height: 92dvh; margin: auto auto 0; padding: 1.25rem; padding-bottom: max(1.25rem, env(safe-area-inset-bottom)); border: 0; border-radius: 24px 24px 0 0; background: #f5f8ff; color: #14284f; overflow-y: auto; }
 .photo-composer::backdrop { background: #0c172b99; backdrop-filter: blur(4px); }
 .photo-composer .upload-flow { padding-bottom: 0; }
@@ -400,3 +398,14 @@ body {
 .photo-picker-error button { min-width: 44px; min-height: 44px; }
 .wedding-event .photo-composer { background: #101110; color: #f6f0e3; }
 @media (min-width: 640px) { .photo-composer { margin: auto; border-radius: 24px; } }
+
+/* Una sola acción principal para añadir fotos al evento. */
+.event-introduction { padding-top: 20px; }
+.event-share-hint { margin-top: 10px; max-width: 42ch; font-size: 14px; line-height: 1.65; color: #607087; }
+.event-share-hint strong { font-weight: 600; color: #24354b; }
+.event-album-link { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; flex-shrink: 0; font-size: 13px; font-weight: 600; }
+.event-album-link:hover { text-decoration: underline; }
+.event-album-link:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; border-radius: 6px; }
+.event-nav .nav-upload { min-height: 48px; padding-inline: 16px; border-radius: 14px; font-size: 14px; gap: 8px; }
+.event-nav .nav-item { border-radius: 12px; }
+@media (max-width: 360px) { .event-nav .nav-upload { padding-inline: 10px; font-size: 13px; } }

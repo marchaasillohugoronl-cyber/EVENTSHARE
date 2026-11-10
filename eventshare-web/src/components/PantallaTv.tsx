@@ -1,6 +1,8 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import CartaNuevaFoto from './CartaNuevaFoto';
+import { NewPhotoTracker } from '@/lib/nuevasFotos';
 import QRCode from 'qrcode';
 import { api, ApiClientError } from '@/lib/api';
 import { esVideo } from '@/lib/video';
@@ -42,6 +44,8 @@ const VISTA_ALEATORIA: { value: SeleccionVista; label: string } = {
 export default function PantallaTv({ event }: { event: PublicEvent }) {
   const screen = useRef<HTMLElement>(null);
   const [posts, setPosts] = useState<Post[]>([]);
+  const [arrivals, setArrivals] = useState<Post[]>([]);
+  const finishArrival = useCallback((id: string) => setArrivals(queue => queue.filter(post => post.id !== id)), []);
   const [index, setIndex] = useState(0);
   // Recorre todos los diseños en orden, sin saltar ninguno.
   const [selectedView, setSelectedView] = useState<SeleccionVista>('random');
@@ -58,17 +62,24 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
 
   useEffect(() => {
     let active = true;
+    const tracker = new NewPhotoTracker();
+    setArrivals([]);
     let timer: ReturnType<typeof setTimeout>;
     const refresh = async () => {
       try {
         // limit=24: cantidad máxima de fotos que reciben TODOS los diseños.
         // Súbelo (por ejemplo a 48) si quieres más variedad en el muro o la rueda.
         const page = await api<Page<Post>>(`/events/${event.id}/posts?limit=24&photos=1`);
-        if (active) { setPosts(page.items); setNotice(''); setUnavailable(false); }
+        if (active) {
+          const fresh = tracker.receive(page.items);
+          const visible = new Set(page.items.filter(post => post.status === 'APPROVED').map(post => post.id));
+          setArrivals(queue => [...queue.filter(post => visible.has(post.id)), ...fresh].slice(0, 24));
+          setPosts(page.items); setNotice(''); setUnavailable(false);
+        }
       } catch (error) {
         if (active) {
           if (error instanceof ApiClientError && [403, 404].includes(error.status)) {
-            setPosts([]); setUnavailable(true);
+            setPosts([]); setArrivals([]); setUnavailable(true);
           }
           setNotice('No se pudo actualizar la pantalla. Reintentando…');
         }
@@ -87,13 +98,13 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
   // Este contador solo lo usa el "collage" (cambia de foto cada 10 s).
   // Los demás diseños llevan su propio temporizador dentro de su componente.
   useEffect(() => {
-    if (magicEnabled) return;
+    if (magicEnabled || arrivals.length > 0) return;
     const timer = setInterval(() => setIndex(value => value + 1), 10000);
     return () => clearInterval(timer);
-  }, [magicEnabled]);
+  }, [magicEnabled, arrivals.length]);
 
   useEffect(() => {
-    if (magicEnabled) return;
+    if (magicEnabled || arrivals.length > 0) return;
     if (selectedView !== 'random') {
       setView(selectedView);
       return;
@@ -108,7 +119,7 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
     if (loading || unavailable || posts.length === 0) return;
     const timer = setInterval(cambiarVista, 12000);
     return () => clearInterval(timer);
-  }, [selectedView, view, loading, unavailable, posts.length, magicEnabled]);
+  }, [selectedView, view, loading, unavailable, posts.length, magicEnabled, arrivals.length]);
 
   async function fullscreen() {
     try {
@@ -160,6 +171,7 @@ export default function PantallaTv({ event }: { event: PublicEvent }) {
     <section className="tv-stage" aria-label="Recuerdos del evento">
       {renderContent()}
     </section>
+    {!unavailable && !magicEnabled && arrivals[0] && <CartaNuevaFoto key={arrivals[0].id} post={arrivals[0]} onComplete={finishArrival} />}
     <div className="tv-brand">
       <img src="/senati-simbolo.png" alt="SENATI" width={1254} height={1254} />
     </div>

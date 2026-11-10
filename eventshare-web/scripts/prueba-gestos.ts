@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { HandTracker, recognizeGesture, nearestTile, type Landmark, type RawHand, type TrackedHand, type Gesture } from '../src/lib/gestureRecognition';
-import { GestureInteraction } from '../src/lib/gestureInteraction';
+import { GestureInteraction, advanceGuide } from '../src/lib/gestureInteraction';
 
 function landmarks(gesture: Gesture): Landmark[] {
   const p = Array.from({ length: 21 }, () => ({ x: .5, y: .9 }));
@@ -77,13 +77,49 @@ test('zoom con segunda mano, límites y palma secundaria no pausa la selección'
   assert.equal(result.transforms[0].scale, .65);
   assert.equal(update().selected, null);
 });
-test('palma borra solo una vez, pausa; puño reanuda el dibujo', () => {
+test('palma pausa sin modificar fotos; puño reanuda el dibujo', () => {
   const engine = new GestureInteraction();
   const update = (...hands: TrackedHand[]) => engine.update({ hands, timestamp: 0 }, toSvg, boxes, bounds);
   assert.equal(update(hand('draw')).drawing, true);
-  assert.equal(update(hand('palm')).clear, true);
-  assert.equal(update(hand('palm')).clear, false);
+  update(hand('pinch'));
+  const moved = update(hand('pinch', .3, .3)).transforms;
+  const paused = update(hand('palm'));
+  assert.equal(paused.paused, true);
+  assert.equal(paused.selected, null);
+  assert.equal(paused.hovered, null);
+  assert.deepEqual(paused.transforms, moved);
+  assert.equal(update(hand('palm')).paused, true);
   assert.equal(update(hand('draw')).drawing, false);
   assert.equal(update(hand('fist')).paused, false);
   assert.equal(update(hand('draw')).drawing, true);
+});
+
+test('preselección coincide con el agarre y sigue la foto después de moverla', () => {
+  const engine = new GestureInteraction();
+  const update = (...hands: TrackedHand[]) => engine.update({ hands, timestamp: 0 }, toSvg, boxes, bounds);
+  const preview = update(hand('none'));
+  assert.equal(preview.hovered, 0);
+  assert.equal(preview.selected, null);
+  const grabbed = update(hand('pinch'));
+  assert.equal(grabbed.selected, preview.hovered);
+  assert.equal(grabbed.hovered, null);
+  update(hand('pinch', .35, .35));
+  assert.equal(update(hand('none', .35, .35)).hovered, 0);
+  assert.equal(update(hand('none', .15, .15)).hovered, null);
+  assert.equal(update(hand('none', .95, .95)).hovered, null);
+  assert.equal(update().hovered, null);
+  assert.equal(update(hand('palm', .35, .35)).hovered, null);
+  assert.equal(update(hand('fist', .35, .35)).hovered, 0);
+});
+
+test('guía avanza por detección, proximidad y agarre; no retrocede al perder la mano', () => {
+  const engine = new GestureInteraction();
+  const update = (...hands: TrackedHand[]) => engine.update({ hands, timestamp: 0 }, toSvg, boxes, bounds);
+  assert.equal(advanceGuide(0, update()), 0);
+  assert.equal(advanceGuide(0, update(hand('none', .95, .95))), 1);
+  assert.equal(advanceGuide(1, update(hand('none'))), 2);
+  assert.equal(advanceGuide(2, update(hand('pinch'))), 3);
+  assert.equal(advanceGuide(3, update()), 3);
+  assert.equal(advanceGuide(2, update()), 2);
+  assert.equal(advanceGuide(0, update(hand('palm'))), 0);
 });
