@@ -1,5 +1,6 @@
 'use client';
 
+import DownloadPhoto from '@/components/DescargarFoto';
 import { esVideo } from '@/lib/video';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -80,6 +81,7 @@ export default function PostCard({ post, code, readOnly = false }: { post: Post;
             </Link>
           </div>
         </div>
+        {post.photoUrl && !esVideo(post.photoUrl) && <div className="mt-3 border-t border-line pt-2"><DownloadPhoto postId={post.id} /></div>}
         {error && <p role="alert" className="mt-1 text-sm text-red-700">{error}</p>}
       </div>
     </article>

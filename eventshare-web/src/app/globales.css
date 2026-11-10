@@ -445,3 +445,37 @@ body {
 .wedding-event .photo-composer .upload-preview-heading, .wedding-event .photo-composer .upload-preview-heading button { color: #e7ddc5; }
 .wedding-event .photo-composer .upload-publish-bar { background: #101110; box-shadow: none; }
 @media (max-width: 360px) { .upload-heading-icon { display: none; } .photo-composer .upload-preview-heading { font-size: 11px; gap: 4px; } }
+
+.photo-download-button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 10px; color: #334155; background: #f8fafc; font-size: 13px; font-weight: 600; }
+.photo-download-button:hover { background: #eef2f7; }
+.photo-download-button:disabled { opacity: .6; cursor: wait; }
+.photo-download-button:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.wedding-event .photo-download-button { color: #f6f0e3; background: #202320; border-color: #38362d; }
+
+/* Acceso directo a la cámara, por encima de la navegación y del área segura. */
+.event-camera-bubble {
+  position: fixed;
+  z-index: 38;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: calc(96px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  width: 68px;
+  height: 68px;
+  border: 2px solid rgb(var(--on-brand-rgb) / .8);
+  border-radius: 50%;
+  background: rgb(var(--brand-rgb));
+  color: rgb(var(--on-brand-rgb));
+  box-shadow: 0 4px 18px rgb(15 23 42 / .25);
+  touch-action: manipulation;
+}
+.event-camera-bubble span { font-size: 11px; font-weight: 700; }
+.event-camera-bubble:active { transform: scale(.96); }
+.event-camera-bubble:focus-visible { outline: 3px solid rgb(var(--brand-rgb)); outline-offset: 4px; }
+.event-nav { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
+@media (max-height: 480px) and (orientation: landscape) {
+  .event-camera-bubble { width: 56px; height: 56px; bottom: calc(88px + env(safe-area-inset-bottom)); }
+}

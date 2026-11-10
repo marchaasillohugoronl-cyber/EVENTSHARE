@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Send, CircleCheck, ImagePlus, ImageUp, ShieldCheck, Clock3, CircleAlert, LoaderCircle, ArrowLeft, X } from 'lucide-react';
+import { Send, CircleCheck, ImagePlus, ImageUp, Camera, ShieldCheck, Clock3, CircleAlert, LoaderCircle, ArrowLeft, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { api, errorMessage } from '@/lib/api';
@@ -24,6 +24,7 @@ export default function UploadForm({ event, initialFile, onClose, onBusyChange, 
   const [phase, setPhase] = useState('');
   const publishing = useRef(false);
   const galleryRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!file) { setPreview(null); return; }
@@ -108,6 +109,7 @@ export default function UploadForm({ event, initialFile, onClose, onBusyChange, 
         <p>Revisa tu foto y comparte el momento.</p>
       </div></div>{onClose && <button type="button" className="upload-close" aria-label="Cerrar vista previa" disabled={busy} onClick={onClose}><X size={20} strokeWidth={1.7} aria-hidden="true" /></button>}</header>
       <input ref={galleryRef} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={onPick} />
+      <input ref={cameraRef} type="file" accept="image/*" capture="environment" hidden onChange={onPick} />
 
       {preview && file && (
         <section className="upload-preview" aria-label="Vista previa de tu publicación">
@@ -115,6 +117,7 @@ export default function UploadForm({ event, initialFile, onClose, onBusyChange, 
             <button type="button" onClick={() => galleryRef.current?.click()} disabled={busy}><ImageUp size={17} strokeWidth={1.7} aria-hidden="true" />Cambiar</button>
           </div>
           <img src={preview} alt="Vista previa de tu foto" />
+          <button type="button" className="btn btn-ghost mt-3 w-full" disabled={busy} onClick={() => cameraRef.current?.click()}><Camera size={20} aria-hidden="true" />Tomar otra foto</button>
         </section>
       )}
 

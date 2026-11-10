@@ -1,4 +1,5 @@
 'use client';
+import DownloadPhoto from '@/components/DescargarFoto';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -97,7 +98,7 @@ export default function PanelEvento({ id }: { id: string }) {
       {!postsLoading && !postsError && !posts.length && <p className="rounded-xl border border-dashed border-line p-10 text-center text-muted">No hay publicaciones en esta sección.</p>}
       <div className="grid items-start gap-5 sm:grid-cols-2 lg:grid-cols-3">{posts.map(post => <article key={post.id} className="overflow-hidden rounded-xl border border-line bg-white">
         {post.photoUrl && (esVideo(post.photoUrl) ? <video src={post.photoUrl} controls playsInline preload="metadata" className="max-h-80 w-full bg-black" /> : <img src={post.photoUrl} alt={`Foto de ${post.author.name}`} loading="lazy" className="max-h-80 w-full object-contain" />)}
-        <div className="p-4"><p className="font-semibold">{post.author.name}</p>{post.message && <p className="mt-2 whitespace-pre-line break-words text-sm">{post.message}</p>}<div className="mt-4 flex flex-wrap gap-2">{post.status !== 'APPROVED' && <button disabled={!!busy} onClick={() => moderate(post, 'APPROVED')} className="btn btn-primary">Aprobar</button>}{post.status !== 'REJECTED' && <button disabled={!!busy} onClick={() => moderate(post, 'REJECTED')} className="btn btn-ghost">Rechazar</button>}</div></div>
+        <div className="p-4">{post.photoUrl && !esVideo(post.photoUrl) && <div className="mb-3"><DownloadPhoto postId={post.id} /></div>}<p className="font-semibold">{post.author.name}</p>{post.message && <p className="mt-2 whitespace-pre-line break-words text-sm">{post.message}</p>}<div className="mt-4 flex flex-wrap gap-2">{post.status !== 'APPROVED' && <button disabled={!!busy} onClick={() => moderate(post, 'APPROVED')} className="btn btn-primary">Aprobar</button>}{post.status !== 'REJECTED' && <button disabled={!!busy} onClick={() => moderate(post, 'REJECTED')} className="btn btn-ghost">Rechazar</button>}</div></div>
       </article>)}</div>
       {postsLoading && <p role="status" className="py-6 text-center">Cargando publicaciones…</p>}
       {cursor && <button className="btn btn-ghost mt-5" disabled={postsLoading || !!busy} onClick={() => loadPosts(cursor)}>Cargar más</button>}
